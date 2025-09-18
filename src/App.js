@@ -18,11 +18,13 @@ function App() {
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const API_URL = 'https://form-automation-backend.onrender.com';
+
     const handleAnalyze = async () => {
         setLoading(true);
         setStatus('Phân tích mã nguồn HTML với Gemini...');
         try {
-            const response = await axios.post('http://localhost:5000/api/analyze-form', {
+            const response = await axios.post(`${API_URL}/api/analyze-form`, {
                 htmlSource: htmlSource
             });
             const { submitUrl, formConfig } = response.data;
