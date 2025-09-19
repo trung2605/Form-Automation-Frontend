@@ -1,70 +1,45 @@
-# Getting Started with Create React App
+Tuyệt vời, ý tưởng thêm icon sẽ làm cho phần giới thiệu trở nên trực quan và sinh động hơn. Dưới đây là phiên bản làm đẹp lại nội dung, có bổ sung các icon phù hợp.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+### **Giới Thiệu FORM AUTOMATION**
 
-In the project directory, you can run:
+Bạn mệt mỏi với việc điền Google Form thủ công? **FORM AUTOMATION** là giải pháp web mạnh mẽ giúp bạn tự động hóa hoàn toàn quy trình này. Được thiết kế để đơn giản hóa công việc lặp lại, ứng dụng của chúng tôi giúp bạn điền và gửi hàng loạt Google Form một cách nhanh chóng và chính xác. ✨
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### **Tại Sao Bạn Nên Chọn FORM AUTOMATION?**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+-   **Tiết Kiệm Thời Gian Vượt Trội**: Chuyển từ việc điền từng form một sang tự động gửi hàng loạt chỉ với vài cú nhấp chuột, giải phóng thời gian quý báu của bạn. ⏱️
+-   **Độ Chính Xác Cao**: Loại bỏ lỗi nhập liệu thủ công. Hệ thống tự động phân tích và điền dữ liệu theo cấu hình bạn đã thiết lập. ✅
+-   **Tùy Biến Linh Hoạt**: Dễ dàng điều chỉnh từng trường dữ liệu, từ việc nhập email tuần tự cho đến chọn ngẫu nhiên các câu trả lời. ⚙️
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### **Tính Năng Nổi Bật**
 
-### `npm run build`
+-   **Phân Tích Form Thông Minh**: Chỉ cần dán mã nguồn HTML, công cụ của chúng tôi sẽ sử dụng trí tuệ nhân tạo để phân tích và nhận diện toàn bộ cấu trúc form. 🤖
+-   **Điền và Gửi Hàng Loạt**: Hỗ trợ gửi form tự động với số lượng tùy chỉnh, sử dụng danh sách email và dữ liệu đầu vào đã được cấu hình. 🚀
+-   **Cấu Hình Dữ Liệu Chuyên Sâu**: Kiểm soát hoàn toàn cách dữ liệu được điền vào từng trường (văn bản, lựa chọn, hộp kiểm), cho phép bạn tùy chỉnh mọi chi tiết. 📊
+-   **Giao Diện Trực Quan**: Giao diện người dùng được thiết kế tối giản, dễ sử dụng, với hướng dẫn từng bước chi tiết giúp bạn bắt đầu ngay lập tức. 🎨
+-   **Nền Tảng Đáng Tin Cậy**: Kết hợp sức mạnh của ReactJS ở frontend và Python ở backend để đảm bảo hiệu suất và sự ổn định. 🔗
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### **Hướng Dẫn Sử Dụng Nhanh**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1.  **Sao Chép Mã Nguồn**: Mở Google Form, nhấn chuột phải và chọn **"Xem nguồn trang" (hoặc Ctrl+U)**, sau đó sao chép toàn bộ nội dung. 📋
+2.  **Dán và Phân Tích**: Dán mã nguồn vào ô tương ứng trên ứng dụng và nhấn **"Phân tích Form"** để hệ thống tự động trích xuất các trường. 🔍
+3.  **Cấu Hình**: Nhập URL View Form, danh sách email và tùy chỉnh cấu hình dữ liệu nếu cần. ✏️
+4.  **Gửi**: Nhấn **"Gửi Form"** để bắt đầu quá trình tự động. 📩
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### **Thông Tin Dự Án**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+-   **Người Phát Triển**: Lê Trí Trung
+-   **Công Nghệ**:
+    -   **Frontend**: ReactJS
+    -   **Backend**: Python (Flask)
+    -   **API**: Gemini (Google) để phân tích HTML
+-   **Đóng Góp**: Mọi ý kiến, báo lỗi hoặc pull request đều được chào đón trên GitHub. 🤝
