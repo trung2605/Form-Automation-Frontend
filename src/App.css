@@ -51,8 +51,60 @@ body {
   opacity: 0.8;
 }
 
+
 .app-main {
   padding: 2rem;
+}
+
+/* Two column layout */
+.two-column-layout {
+  display: flex;
+  gap: 2rem;
+}
+
+.left-col {
+  flex: 1 1 60%;
+  min-width: 340px;
+}
+
+.right-col {
+  flex: 1 1 40%;
+  min-width: 260px;
+  background: #f8fafc;
+  border-left: 2px solid var(--border-color);
+  padding: 1.5rem 1.5rem 1.5rem 2rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+}
+
+.guide-box {
+  width: 100%;
+}
+
+.guide-box h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.guide-box ol {
+  padding-left: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.guide-box li {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+.tip-box {
+  background: #fffbe6;
+  border-left: 4px solid #f7c948;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  color: #7a5c00;
+  font-size: 0.98rem;
 }
 
 .form-layout {

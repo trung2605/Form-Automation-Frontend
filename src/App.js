@@ -17,6 +17,7 @@ function App() {
     const [formConfig, setFormConfig] = useState(JSON.stringify(defaultFormConfig, null, 2));
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
+    const [viewformUrl, setViewformUrl] = useState('');
 
     const API_URL = 'https://form-automation-backend.onrender.com';
 
@@ -46,7 +47,7 @@ function App() {
             const emailList = emails.split(',').map(email => email.trim()).filter(e => e);
             const parsedFormConfig = JSON.parse(formConfig);
             const response = await axios.post(`${API_URL}/api/fill-form`, {
-                formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdHFRGtAy264oPNiZKcsifRyRhT6iiZKFqhzqkJnXCNDQk02A/viewform', // Giữ nguyên URL này
+                formUrl: viewformUrl, // Giữ nguyên URL này
                 submitUrl,
                 emails: emailList,
                 count: Number(count),
@@ -66,77 +67,107 @@ function App() {
                 <h1>FORM AUTOMATION</h1>
                 <p>Created by Lê Trí Trung</p>
             </header>
-            
-            <main className="app-main">
-                <form onSubmit={handleSubmit} className="form-layout">
-                    <div className="form-group">
-                        <label>Mã nguồn HTML của View Form</label>
-                        <textarea
-                            value={htmlSource}
-                            onChange={(e) => setHtmlSource(e.target.value)}
-                            placeholder="Dán toàn bộ mã nguồn trang tại đây..."
-                            className="input-textarea"
-                        />
-                        <button type="button" onClick={handleAnalyze} disabled={loading} className="btn-primary btn-analyze">
-                            {loading && status.includes('Phân tích') ? 'Đang phân tích...' : 'Phân tích Form'}
+            <main className="app-main two-column-layout">
+                {/* Cột trái: Ứng dụng */}
+                <div className="left-col">
+                    <form onSubmit={handleSubmit} className="form-layout">
+                        <div className="form-group">
+                            <label>Mã nguồn HTML của View Form</label>
+                            <textarea
+                                value={htmlSource}
+                                onChange={(e) => setHtmlSource(e.target.value)}
+                                placeholder="Dán toàn bộ mã nguồn trang tại đây..."
+                                className="input-textarea"
+                            />
+                            <button type="button" onClick={handleAnalyze} disabled={loading} className="btn-primary btn-analyze">
+                                {loading && status.includes('Phân tích') ? 'Đang phân tích...' : 'Phân tích Form'}
+                            </button>
+                        </div>
+
+                        <div className="form-group">
+                            <label>View Form URL</label>
+                            <input
+                                type="text"
+                                value={viewformUrl}
+                                onChange={(e) => setViewformUrl(e.target.value)}
+                                placeholder="Nhập URL của View Form tại đây..."
+                                className="input-text"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Form Submit URL</label>
+                            <input
+                                type="text"
+                                value={submitUrl}
+                                readOnly
+                                className="input-text read-only"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Danh sách Email (cách nhau bởi dấu phẩy)</label>
+                            <textarea
+                                value={emails}
+                                onChange={(e) => setEmails(e.target.value)}
+                                className="input-textarea"
+                                rows="4"
+                                placeholder="vd: user1@gmail.com, user2@gmail.com"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Số lần gửi</label>
+                            <input
+                                type="number"
+                                value={count}
+                                onChange={(e) => setCount(e.target.value)}
+                                min="1"
+                                className="input-text"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Cấu hình Form (JSON)</label>
+                            <textarea
+                                value={formConfig}
+                                onChange={(e) => setFormConfig(e.target.value)}
+                                className="input-textarea"
+                                rows="10"
+                                style={{ fontFamily: 'monospace' }}
+                            />
+                        </div>
+                        <button type="submit" disabled={loading} className="btn-primary btn-submit">
+                            {loading && status.includes('gửi') ? 'Đang gửi...' : 'Gửi Form'}
                         </button>
+                    </form>
+                    {status && (
+                        <div className="status-box">
+                            <p><strong>Trạng thái:</strong> {status}</p>
+                        </div>
+                    )}
+                </div>
+                {/* Cột phải: Hướng dẫn */}
+                <div className="right-col">
+                    <div className="guide-box">
+                        <h2>Hướng dẫn lấy mã nguồn HTML Google Form</h2>
+                        <ol>
+                            <li>Mở Google Form bạn muốn tự động điền trên trình duyệt Chrome hoặc Edge.</li>
+                            <li>Nhấn chuột phải vào bất kỳ vị trí trống nào trên trang, chọn <b>"Xem nguồn trang"</b> (View page source) hoặc nhấn tổ hợp phím <b>Ctrl+U</b>.</li>
+                            <li>Một tab mới sẽ mở ra hiển thị mã nguồn HTML của trang.</li>
+                            <li>Nhấn <b>Ctrl+A</b> để chọn toàn bộ, sau đó <b>Ctrl+C</b> để sao chép.</li>
+                            <li>Quay lại ứng dụng này, dán vào ô <b>"Mã nguồn HTML của View Form"</b> phía bên trái.</li>
+                            <li>Nhập URL của View Form vào ô <b>"View Form URL"</b> (ví dụ: https://docs.google.com/forms/...).</li>
+                            <li>Nhấn <b>Phân tích Form</b> để hệ thống tự động nhận diện cấu trúc biểu mẫu.</li>
+                        </ol>
+                        <div className="tip-box">
+                            <b>Lưu ý:</b> Không dùng mã nguồn của trang "Xem trước" (Preview), hãy dùng đúng trang View Form thực tế.
+                        </div>
                     </div>
-
-                    <div className="form-group">
-                        <label>Form Submit URL</label>
-                        <input
-                            type="text"
-                            value={submitUrl}
-                            readOnly
-                            className="input-text read-only"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Danh sách Email (cách nhau bởi dấu phẩy)</label>
-                        <textarea
-                            value={emails}
-                            onChange={(e) => setEmails(e.target.value)}
-                            className="input-textarea"
-                            rows="4"
-                            placeholder="vd: user1@gmail.com, user2@gmail.com"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Số lần gửi</label>
-                        <input
-                            type="number"
-                            value={count}
-                            onChange={(e) => setCount(e.target.value)}
-                            min="1"
-                            className="input-text"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Cấu hình Form (JSON)</label>
-                        <textarea
-                            value={formConfig}
-                            onChange={(e) => setFormConfig(e.target.value)}
-                            className="input-textarea read-only"
-                            rows="10"
-                            style={{ fontFamily: 'monospace' }}
-                            readOnly
-                        />
-                    </div>
-                    
-                    <button type="submit" disabled={loading} className="btn-primary btn-submit">
-                        {loading && status.includes('gửi') ? 'Đang gửi...' : 'Gửi Form'}
-                    </button>
-                </form>
-
-                {status && (
-                    <div className="status-box">
-                        <p><strong>Trạng thái:</strong> {status}</p>
-                    </div>
-                )}
+                </div>
             </main>
         </div>
     );
