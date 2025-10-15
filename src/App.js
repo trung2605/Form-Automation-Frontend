@@ -25,6 +25,7 @@ function App() {
   const [submitUrl, setSubmitUrl] = useState("");
   const [emails, setEmails] = useState("");
   const [count, setCount] = useState(1);
+  const [maxDelay, setMaxDelay] = useState(4);
   const [formConfig, setFormConfig] = useState(
     JSON.stringify(defaultFormConfig, null, 2)
   );
@@ -33,6 +34,8 @@ function App() {
   const [viewformUrl, setViewformUrl] = useState("");
 
   const API_URL = "https://form-automation-backend.onrender.com";
+  // const API_URL = "http://127.0.0.1:5000";
+
 
   const handleAnalyze = async () => {
     setLoading(true);
@@ -70,6 +73,7 @@ function App() {
         submitUrl,
         emails: emailList,
         count: Number(count),
+        maxDelay: Number(maxDelay),
         formConfig: parsedFormConfig,
       });
       setStatus(response.data.message);
@@ -157,6 +161,18 @@ function App() {
                 value={count}
                 onChange={(e) => setCount(e.target.value)}
                 min="1"
+                className="input-text"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Thời gian trễ tối đa giữa các lần gửi (giây)</label>
+              <input
+                type="number"
+                value={maxDelay}
+                onChange={(e) => setMaxDelay(e.target.value)}
+                min="0"
                 className="input-text"
                 required
               />
