@@ -1,10 +1,11 @@
 // src/App.js
 import React, { useState } from "react";
 import axios from "axios";
-import "./App.css"; // We'll create this file for global styles
+import "./App.css";
 import imgStep1 from "./assets/step1.png";
 import imgStep2 from "./assets/step2.png";
 import imgStep3 from "./assets/step3.png";
+import FormConfigEditor from "./FormConfigEditor";
 
 const defaultFormConfig = {
   "entry.1921726016": { type: "email" },
@@ -20,6 +21,15 @@ const defaultFormConfig = {
   },
 };
 
+function Tooltip({ text }) {
+  return (
+    <span className="tooltip-wrap">
+      <span className="tooltip-icon">?</span>
+      <span className="tooltip-box">{text}</span>
+    </span>
+  );
+}
+
 function App() {
   const [htmlSource, setHtmlSource] = useState("");
   const [submitUrl, setSubmitUrl] = useState("");
@@ -30,24 +40,41 @@ function App() {
     JSON.stringify(defaultFormConfig, null, 2)
   );
   const [status, setStatus] = useState("");
+  const [hiddenFields, setHiddenFields] = useState({});
   const [loading, setLoading] = useState(false);
   const [viewformUrl, setViewformUrl] = useState("");
+  const [aiProvider, setAiProvider] = useState("");
 
-  const API_URL = "https://form-automation-backend.onrender.com";
-  // const API_URL = "http://127.0.0.1:5000";
+  const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem("geminiKey") || "");
+  const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem("openaiKey") || "");
+  const [hfKey, setHfKey] = useState(() => localStorage.getItem("hfKey") || "");
+
+  const saveKey = (setter, storageKey, value) => {
+    setter(value);
+    localStorage.setItem(storageKey, value);
+  };
+
+  // const API_URL = "https://form-automation-backend.onrender.com";
+  const API_URL = "http://127.0.0.1:5000";
 
 
   const handleAnalyze = async () => {
     setLoading(true);
-    setStatus("Phân tích mã nguồn HTML với Gemini...");
+    setAiProvider("");
+    setStatus("Đang phân tích mã nguồn HTML...");
     try {
       const response = await axios.post(`${API_URL}/api/analyze-form`, {
-        htmlSource: htmlSource,
+        htmlSource,
+        geminiKey: geminiKey || undefined,
+        openaiKey: openaiKey || undefined,
+        hfKey: hfKey || undefined,
       });
-      const { submitUrl, formConfig } = response.data;
+      const { submitUrl, formConfig, hiddenFields, _provider } = response.data;
       setSubmitUrl(submitUrl);
       setFormConfig(JSON.stringify(formConfig, null, 2));
-      setStatus("Phân tích hoàn tất! Cấu hình biểu mẫu đã được điền.");
+      setHiddenFields(hiddenFields || {});
+      setAiProvider(_provider || "");
+      setStatus(`Phân tích hoàn tất! (dùng ${_provider || "AI"}) Cấu hình biểu mẫu đã được điền.`);
     } catch (error) {
       setStatus(
         "Lỗi khi phân tích biểu mẫu: " +
@@ -75,6 +102,7 @@ function App() {
         count: Number(count),
         maxDelay: Number(maxDelay),
         formConfig: parsedFormConfig,
+        hiddenFields: hiddenFields
       });
       setStatus(response.data.message);
     } catch (error) {
@@ -97,8 +125,50 @@ function App() {
         {/* Cột trái: Ứng dụng */}
         <div className="left-col">
           <form onSubmit={handleSubmit} className="form-layout">
+            <div className="ai-config-section">
+              <div className="ai-config-header">
+                <span className="ai-config-title">Cấu hình AI</span>
+                {aiProvider && (
+                  <span className="ai-provider-badge">Đang dùng: {aiProvider}</span>
+                )}
+              </div>
+              <div className="ai-config-grid">
+                <div className="form-group">
+                  <label>Gemini API Key <Tooltip text="API key từ Google AI Studio (ai.google.dev). Ưu tiên số 1. Free tier giới hạn 20 req/ngày." /></label>
+                  <input
+                    type="password"
+                    value={geminiKey}
+                    onChange={(e) => saveKey(setGeminiKey, "geminiKey", e.target.value)}
+                    placeholder="AIza..."
+                    className="input-text"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>OpenAI API Key <Tooltip text="API key từ platform.openai.com. Ưu tiên số 2 nếu không có Gemini key. Dùng model gpt-4o-mini." /></label>
+                  <input
+                    type="password"
+                    value={openaiKey}
+                    onChange={(e) => saveKey(setOpenaiKey, "openaiKey", e.target.value)}
+                    placeholder="sk-..."
+                    className="input-text"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>HuggingFace API Key <Tooltip text="API key từ huggingface.co/settings/tokens. Ưu tiên số 3. Cần tích quyền 'Make calls to Inference Providers'." /></label>
+                  <input
+                    type="password"
+                    value={hfKey}
+                    onChange={(e) => saveKey(setHfKey, "hfKey", e.target.value)}
+                    placeholder="hf_..."
+                    className="input-text"
+                  />
+                </div>
+              </div>
+              <p className="ai-config-hint">Ưu tiên: Gemini → OpenAI → HuggingFace. Key được lưu trong trình duyệt.</p>
+            </div>
+
             <div className="form-group">
-              <label>Mã nguồn HTML của View Form</label>
+              <label>Mã nguồn HTML của View Form <Tooltip text="Mở Google Form → Ctrl+U để xem nguồn trang → Ctrl+A rồi Ctrl+C để sao chép toàn bộ → Dán vào đây." /></label>
               <textarea
                 value={htmlSource}
                 onChange={(e) => setHtmlSource(e.target.value)}
@@ -121,7 +191,7 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>View Form URL</label>
+              <label>View Form URL <Tooltip text="URL trang xem form, kết thúc bằng /viewform. Ví dụ: https://docs.google.com/forms/d/e/xxx/viewform" /></label>
               <input
                 type="text"
                 value={viewformUrl}
@@ -133,7 +203,7 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>Form Submit URL</label>
+              <label>Form Submit URL <Tooltip text="URL submit được tự động điền sau khi phân tích. Không cần chỉnh sửa." /></label>
               <input
                 type="text"
                 value={submitUrl}
@@ -143,7 +213,7 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>Danh sách Email (cách nhau bởi dấu phẩy)</label>
+              <label>Danh sách Email <Tooltip text="Nhập các email cách nhau bởi dấu phẩy. Hệ thống sẽ chọn ngẫu nhiên 1 email cho mỗi lần gửi. Ví dụ: a@gmail.com, b@gmail.com" /></label>
               <textarea
                 value={emails}
                 onChange={(e) => setEmails(e.target.value)}
@@ -155,7 +225,7 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>Số lần gửi</label>
+              <label>Số lần gửi <Tooltip text="Tổng số lượt điền form sẽ được gửi đi. Mỗi lượt chọn ngẫu nhiên 1 email và 1 đáp án theo tỉ lệ weight." /></label>
               <input
                 type="number"
                 value={count}
@@ -167,7 +237,7 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>Thời gian trễ tối đa giữa các lần gửi (giây)</label>
+              <label>Thời gian trễ tối đa <Tooltip text="Giữa mỗi lần gửi, hệ thống chờ ngẫu nhiên từ 0 đến N giây. Giúp tránh bị Google phát hiện spam. Khuyến nghị: 3-10 giây." /></label>
               <input
                 type="number"
                 value={maxDelay}
@@ -179,14 +249,8 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>Cấu hình Form (JSON)</label>
-              <textarea
-                value={formConfig}
-                onChange={(e) => setFormConfig(e.target.value)}
-                className="input-textarea json-output"
-                rows="10"
-                style={{ fontFamily: "monospace" }}
-              />
+              <label>Cấu hình Form</label>
+              <FormConfigEditor formConfig={formConfig} onChange={setFormConfig} />
             </div>
 
             <button
