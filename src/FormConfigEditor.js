@@ -1,7 +1,8 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
+import MermaidGraph from "./MermaidGraph";
 import "./FormConfigEditor.css";
 
-function FieldCard({ entryKey, fieldData, onChange }) {
+function FieldCard({ entryKey, fieldData, onChange, cardRef, formRouting }) {
   const isChoice = fieldData.type === "choice" && Array.isArray(fieldData.options);
 
   const handleWeightChange = (index, newPct) => {
@@ -30,7 +31,7 @@ function FieldCard({ entryKey, fieldData, onChange }) {
   };
 
   return (
-    <div className="field-card">
+    <div className="field-card" ref={cardRef}>
       <div className="field-card-header">
         <span className="field-entry-key">{entryKey}</span>
         <span className={`field-type-badge ${fieldData.type}`}>{fieldData.type}</span>
@@ -56,6 +57,16 @@ function FieldCard({ entryKey, fieldData, onChange }) {
                   className="weight-slider"
                 />
                 <span className="weight-pct">{pctDisplay}%</span>
+                {fieldData.optionTargets && fieldData.optionTargets[opt] && fieldData.optionTargets[opt] !== '-2' && (
+                  <span className="routing-badge" title={`Option này dẫn tới nhánh ${fieldData.optionTargets[opt]}`}>
+                    {fieldData.optionTargets[opt] === '0' || fieldData.optionTargets[opt] === '-1' ? '➔ Gửi Form' : '➔ Nhảy nhánh'}
+                  </span>
+                )}
+                {fieldData.optionTargets && fieldData.optionTargets[opt] === '-2' && (
+                  <span className="routing-badge" style={{backgroundColor: '#f5f5f5', color: '#595959', borderColor: '#d9d9d9'}} title="Tiếp tục phần tiếp theo">
+                    ➔ Tiếp tục
+                  </span>
+                )}
               </div>
             );
           })}
@@ -80,13 +91,127 @@ function WeightTotal({ weights }) {
   );
 }
 
-export default function FormConfigEditor({ formConfig, onChange }) {
-  const [panelWidth, setPanelWidth] = useState(55);
-  const dragging = useRef(false);
+export default function FormConfigEditor({ formConfig, onChange, formRouting = [] }) {
+  const [navWidth, setNavWidth] = useState(260); // px
+  const [panelWidth, setPanelWidth] = useState(55); // flex %
+  const [activeKey, setActiveKey] = useState(null);
+  const draggingNav = useRef(false);
+  const draggingCenter = useRef(false);
   const containerRef = useRef(null);
+  const cardRefs = useRef({});
+  const listRef = useRef(null);
+  const [rightTab, setRightTab] = useState("flowchart"); // "json" or "flowchart"
 
   let parsed = null;
   try { parsed = JSON.parse(formConfig); } catch (_) {}
+
+  const entries = parsed ? Object.entries(parsed) : [];
+
+  const mermaidCode = useMemo(() => {
+    if (!formRouting || !formRouting.length || !parsed) return '';
+    let md = 'graph TD\n';
+    md += '  classDef normalQ fill:#FFFFFF,stroke:#D1CDC7,stroke-width:1px,color:#141413,rx:8px,ry:8px;\n';
+    md += '  classDef branchQ fill:#FCFBFA,stroke:#F37338,stroke-width:2px,color:#CF4500;\n';
+    md += '  classDef endNode fill:#F37338,stroke:#CF4500,stroke-width:2px,color:#FFFFFF;\n';
+    md += '  classDef emptyPage fill:#F3F0EE,stroke:#D1CDC7,stroke-width:1px,color:#696969,stroke-dasharray: 5 5;\n';
+
+    const pageEntryNodes = {};
+    const pageExitNodes = {};
+
+    formRouting.forEach((page, idx) => {
+      let pageName = `Trang ${idx + 1}`;
+      if (idx === 0) pageName = "Bắt đầu";
+      if (page.page_id && page.page_id !== 'none') pageName += ` (ID: ${page.page_id})`;
+      
+      md += `  subgraph P${idx} ["${pageName}"]\n`;
+      md += `    direction TB\n`;
+      
+      const entriesList = page.entries || [];
+      if (entriesList.length === 0) {
+        const dummyId = `P${idx}_dummy`;
+        md += `    ${dummyId}["Không có câu hỏi"]:::emptyPage\n`;
+        pageEntryNodes[idx] = dummyId;
+        pageExitNodes[idx] = dummyId;
+      } else {
+        let prevNodeId = null;
+        entriesList.forEach((entry, i) => {
+          const cfg = parsed[entry];
+          const safeEntry = entry.replace(/\./g, '_');
+          const isBranching = cfg && cfg.optionTargets && Object.keys(cfg.optionTargets).length > 0;
+          
+          let safeLabel = (cfg ? (cfg.label || entry) : entry).replace(/"/g, "'");
+          if (safeLabel.length > 50) safeLabel = safeLabel.substring(0, 50) + '...';
+          
+          const nodeId = `Q_${safeEntry}`;
+          if (isBranching) {
+            md += `    ${nodeId}{"${safeLabel}"}:::branchQ\n`;
+          } else {
+            md += `    ${nodeId}("${safeLabel}"):::normalQ\n`;
+          }
+
+          if (i === 0) pageEntryNodes[idx] = nodeId;
+          if (prevNodeId) {
+            md += `    ${prevNodeId} --> ${nodeId}\n`;
+          }
+          prevNodeId = nodeId;
+        });
+        pageExitNodes[idx] = prevNodeId;
+      }
+      md += `  end\n`;
+    });
+    
+    md += '  End(("Gửi Form / Hoàn tất")):::endNode\n';
+
+    formRouting.forEach((page, idx) => {
+      const exitNode = pageExitNodes[idx];
+      let hasBranching = false;
+      let branchKey = null;
+
+      const entriesList = page.entries || [];
+      for (const entry of entriesList) {
+        const cfg = parsed[entry];
+        if (cfg && cfg.optionTargets && Object.keys(cfg.optionTargets).length > 0) {
+          hasBranching = true;
+          branchKey = entry;
+          break; 
+        }
+      }
+
+      if (hasBranching) {
+        const cfg = parsed[branchKey];
+        const safeBranchKey = branchKey.replace(/\./g, '_');
+        const branchExitNode = `Q_${safeBranchKey}`;
+        
+        Object.entries(cfg.optionTargets).forEach(([opt, target]) => {
+          const safeOpt = opt.replace(/"/g, "'");
+          if (target === '-1' || target === '0') {
+            md += `  ${branchExitNode} -- "${safeOpt}" --> End\n`;
+          } else if (target === '-2') {
+            if (idx + 1 < formRouting.length) {
+              md += `  ${branchExitNode} -- "${safeOpt}" --> ${pageEntryNodes[idx + 1]}\n`;
+            } else {
+              md += `  ${branchExitNode} -- "${safeOpt}" --> End\n`;
+            }
+          } else {
+            const targetIdx = formRouting.findIndex(p => String(p.page_id) === String(target));
+            if (targetIdx !== -1) {
+              md += `  ${branchExitNode} -- "${safeOpt}" --> ${pageEntryNodes[targetIdx]}\n`;
+            } else {
+              md += `  ${branchExitNode} -- "${safeOpt}" --> End\n`;
+            }
+          }
+        });
+      } else {
+        if (idx + 1 < formRouting.length) {
+          md += `  ${exitNode} --> ${pageEntryNodes[idx + 1]}\n`;
+        } else {
+          md += `  ${exitNode} --> End\n`;
+        }
+      }
+    });
+
+    return md;
+  }, [formRouting, parsed]);
 
   const handleFieldChange = useCallback((key, newField) => {
     if (!parsed) return;
@@ -94,22 +219,49 @@ export default function FormConfigEditor({ formConfig, onChange }) {
     onChange(JSON.stringify(updated, null, 2));
   }, [parsed, onChange]);
 
-  const onMouseDown = (e) => {
+  const scrollToCard = (key) => {
+    setActiveKey(key);
+    const el = cardRefs.current[key];
+    if (el && listRef.current) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const onMouseDownNav = (e) => {
     e.preventDefault();
-    dragging.current = true;
+    draggingNav.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
+
+  const onMouseDownCenter = (e) => {
+    e.preventDefault();
+    draggingCenter.current = true;
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
   };
 
   useEffect(() => {
     const onMouseMove = (e) => {
-      if (!dragging.current || !containerRef.current) return;
+      if (!containerRef.current) return;
+      if (!draggingNav.current && !draggingCenter.current) return;
+      
       const rect = containerRef.current.getBoundingClientRect();
-      const pct = ((e.clientX - rect.left) / rect.width) * 100;
-      setPanelWidth(Math.max(25, Math.min(75, pct)));
+      
+      if (draggingNav.current) {
+        let newNav = e.clientX - rect.left;
+        setNavWidth(Math.max(150, Math.min(600, newNav)));
+      } else if (draggingCenter.current) {
+        const startX = rect.left + navWidth + 8;
+        const availableWidth = rect.width - navWidth - 16;
+        const relativeX = e.clientX - startX;
+        const pct = (relativeX / availableWidth) * 100;
+        setPanelWidth(Math.max(15, Math.min(85, pct)));
+      }
     };
     const onMouseUp = () => {
-      dragging.current = false;
+      draggingNav.current = false;
+      draggingCenter.current = false;
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
@@ -119,28 +271,97 @@ export default function FormConfigEditor({ formConfig, onChange }) {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, []);
+  }, [navWidth]);
+
+  useEffect(() => {
+    const leftPanel = listRef.current;
+    if (!leftPanel) return;
+    const handler = () => {
+      let currentKey = null;
+      for (const [key] of entries) {
+        const el = cardRefs.current[key];
+        if (el && el.offsetTop - leftPanel.scrollTop <= 60) {
+          currentKey = key;
+        }
+      }
+      if (currentKey) setActiveKey(currentKey);
+    };
+    leftPanel.addEventListener("scroll", handler);
+    return () => leftPanel.removeEventListener("scroll", handler);
+  }, [entries]);
 
   return (
     <div className="config-editor-wrapper" ref={containerRef}>
-      <div className="config-left" style={{ width: `${panelWidth}%` }}>
+      <div className="config-nav" style={{ width: `${navWidth}px` }}>
+        <div className="panel-label">Câu hỏi</div>
+        <div className="config-nav-list">
+          {entries.map(([key, field], idx) => {
+            const displayLabel = field.label || key;
+            return (
+              <button
+                key={key}
+                className={`nav-item ${activeKey === key ? "active" : ""}`}
+                onClick={() => scrollToCard(key)}
+                title={displayLabel}
+              >
+                <span className="nav-index">{idx + 1}</span>
+                <span className="nav-label">{displayLabel}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="resize-handle" onMouseDown={onMouseDownNav}>
+        <div className="resize-grip" />
+      </div>
+
+      <div className="config-left" style={{ flex: panelWidth }} ref={listRef}>
         <div className="panel-label">Cấu hình trực quan</div>
         {parsed ? (
-          Object.entries(parsed).map(([key, field]) => (
-            <FieldCard key={key} entryKey={key} fieldData={field} onChange={handleFieldChange} />
+          entries.map(([key, field]) => (
+            <FieldCard
+              key={key}
+              entryKey={key}
+              fieldData={field}
+              onChange={handleFieldChange}
+              cardRef={(el) => { cardRefs.current[key] = el; }}
+              formRouting={formRouting}
+            />
           ))
         ) : (
           <p className="parse-error">JSON không hợp lệ</p>
         )}
       </div>
 
-      <div className="resize-handle" onMouseDown={onMouseDown}>
+      <div className="resize-handle" onMouseDown={onMouseDownCenter}>
         <div className="resize-grip" />
       </div>
 
-      <div className="config-right" style={{ width: `${100 - panelWidth}%` }}>
-        <div className="panel-label">JSON (read-only)</div>
-        <pre className="json-preview">{formConfig}</pre>
+      <div className="config-right" style={{ flex: 100 - panelWidth, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid #d9d9d9' }}>
+          <button 
+            className={`tab-button ${rightTab === 'flowchart' ? 'active' : ''}`}
+            onClick={() => setRightTab('flowchart')}
+            style={{ flex: 1, padding: '8px', border: 'none', background: rightTab === 'flowchart' ? '#FFFFFF' : '#F3F0EE', cursor: 'pointer', borderRight: '1px solid #D1CDC7', fontWeight: rightTab === 'flowchart' ? '700' : '500', color: rightTab === 'flowchart' ? '#CF4500' : 'inherit' }}
+          >
+            Sơ đồ rẽ nhánh
+          </button>
+          <button 
+            className={`tab-button ${rightTab === 'json' ? 'active' : ''}`}
+            onClick={() => setRightTab('json')}
+            style={{ flex: 1, padding: '8px', border: 'none', background: rightTab === 'json' ? '#FFFFFF' : '#F3F0EE', cursor: 'pointer', fontWeight: rightTab === 'json' ? '700' : '500', color: rightTab === 'json' ? '#CF4500' : 'inherit' }}
+          >
+            JSON (read-only)
+          </button>
+        </div>
+        <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#fff' }}>
+          {rightTab === 'json' ? (
+            <pre className="json-preview" style={{ height: '100%', margin: 0 }}>{formConfig}</pre>
+          ) : (
+            <MermaidGraph chart={mermaidCode} />
+          )}
+        </div>
       </div>
     </div>
   );

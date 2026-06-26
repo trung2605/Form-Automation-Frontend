@@ -1,11 +1,12 @@
 // src/App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import imgStep1 from "./assets/step1.png";
 import imgStep2 from "./assets/step2.png";
 import imgStep3 from "./assets/step3.png";
 import FormConfigEditor from "./FormConfigEditor";
+import SAMPLE_EMAILS from "./sampleEmails";
 
 const defaultFormConfig = {
   "entry.1921726016": { type: "email" },
@@ -41,6 +42,7 @@ function App() {
   );
   const [status, setStatus] = useState("");
   const [hiddenFields, setHiddenFields] = useState({});
+  const [formRouting, setFormRouting] = useState([]);
   const [loading, setLoading] = useState(false);
   const [viewformUrl, setViewformUrl] = useState("");
   const [aiProvider, setAiProvider] = useState("");
@@ -53,6 +55,28 @@ function App() {
     setter(value);
     localStorage.setItem(storageKey, value);
   };
+
+  const fillSampleEmails = () => {
+    setEmails(SAMPLE_EMAILS.join(", "));
+  };
+
+  // Tự động lấy URL từ HTML Source
+  useEffect(() => {
+    if (htmlSource) {
+      // 1. Tìm thẻ <meta property="og:url" content="...">
+      const metaMatch = htmlSource.match(/<meta\s+property="og:url"\s+content="([^"]+)"/i);
+      if (metaMatch && metaMatch[1]) {
+        setViewformUrl(metaMatch[1]);
+        return;
+      }
+      
+      // 2. Nếu không có, tìm trong form action
+      const actionMatch = htmlSource.match(/<form[^>]+action="([^"]+\/formResponse)"/i);
+      if (actionMatch && actionMatch[1]) {
+        setViewformUrl(actionMatch[1].replace('/formResponse', '/viewform'));
+      }
+    }
+  }, [htmlSource]);
 
   // const API_URL = "https://form-automation-backend.onrender.com";
   const API_URL = "http://127.0.0.1:5000";
@@ -69,10 +93,22 @@ function App() {
         openaiKey: openaiKey || undefined,
         hfKey: hfKey || undefined,
       });
-      const { submitUrl, formConfig, hiddenFields, _provider } = response.data;
+      const { submitUrl, formConfig, hiddenFields, formRouting, _provider, questionOrder } = response.data;
+      
+      let orderedConfig = formConfig;
+      if (questionOrder && Array.isArray(questionOrder)) {
+        orderedConfig = {};
+        questionOrder.forEach(key => {
+          if (formConfig[key]) {
+            orderedConfig[key] = formConfig[key];
+          }
+        });
+      }
+      
       setSubmitUrl(submitUrl);
-      setFormConfig(JSON.stringify(formConfig, null, 2));
+      setFormConfig(JSON.stringify(orderedConfig, null, 2));
       setHiddenFields(hiddenFields || {});
+      setFormRouting(formRouting || []);
       setAiProvider(_provider || "");
       setStatus(`Phân tích hoàn tất! (dùng ${_provider || "AI"}) Cấu hình biểu mẫu đã được điền.`);
     } catch (error) {
@@ -102,7 +138,8 @@ function App() {
         count: Number(count),
         maxDelay: Number(maxDelay),
         formConfig: parsedFormConfig,
-        hiddenFields: hiddenFields
+        hiddenFields: hiddenFields,
+        formRouting: formRouting
       });
       setStatus(response.data.message);
     } catch (error) {
@@ -213,7 +250,17 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label>Danh sách Email <Tooltip text="Nhập các email cách nhau bởi dấu phẩy. Hệ thống sẽ chọn ngẫu nhiên 1 email cho mỗi lần gửi. Ví dụ: a@gmail.com, b@gmail.com" /></label>
+              <label className="label-with-action">
+                Danh sách Email <Tooltip text="Nhập các email cách nhau bởi dấu phẩy. Hệ thống sẽ chọn ngẫu nhiên 1 email cho mỗi lần gửi." />
+                <button
+                  type="button"
+                  className="btn-sample"
+                  onClick={fillSampleEmails}
+                  title="Tự động điền 400+ email mẫu người Việt"
+                >
+                  📋 Dùng data mẫu
+                </button>
+              </label>
               <textarea
                 value={emails}
                 onChange={(e) => setEmails(e.target.value)}
@@ -250,7 +297,10 @@ function App() {
 
             <div className="form-group">
               <label>Cấu hình Form</label>
-              <FormConfigEditor formConfig={formConfig} onChange={setFormConfig} />
+              <div className="tip-box" style={{backgroundColor: '#e6f7ff', color: '#0050b3', borderColor: '#91d5ff', marginBottom: '10px', fontSize: '0.9em'}}>
+                <b>🔄 Tính năng mới: Form Routing Engine!</b> Hệ thống đã tự động nhận diện các nhánh (rẽ trang). Hãy yên tâm điền form, backend sẽ tự động lọc dữ liệu thừa nếu trang đó bị nhảy cóc!
+              </div>
+              <FormConfigEditor formConfig={formConfig} onChange={setFormConfig} formRouting={formRouting} />
             </div>
 
             <button
@@ -329,6 +379,9 @@ function App() {
             <div className="tip-box">
               <b>Lưu ý:</b> Không dùng mã nguồn của trang "Xem trước" (Preview),
               hãy dùng đúng trang View Form thực tế.
+            </div>
+            <div className="tip-box" style={{backgroundColor: '#fff3cd', color: '#856404', borderColor: '#ffeeba', marginTop: '10px'}}>
+              <b>Lỗi 400 Bad Request:</b> Nếu gặp lỗi này khi chạy Form có phân nhánh (VD: Chọn "Không" thì kết thúc form luôn), Google sẽ chặn nếu bạn gửi cả các câu trả lời của nhánh bị bỏ qua. Để khắc phục, trong bảng JSON bên trái, hãy set <b>Weight = 0</b> cho tùy chọn gây nhảy cóc trang để script luôn đi qua đầy đủ các trang!
             </div>
           </div>
         </div>
