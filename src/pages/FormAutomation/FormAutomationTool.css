@@ -28,7 +28,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--canvas);
   margin: 0;
   padding: 0;
@@ -39,7 +39,7 @@ body {
 /* ── Scrollbar ────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--dust); border-radius: var(--r-pill); }
+::-webkit-scrollbar-thumb { background: var(--dust); border-radius: 0; }
 ::-webkit-scrollbar-thumb:hover { background: var(--slate); }
 
 /* ── App shell ────────────────────────────────────────────────────────────── */
@@ -62,7 +62,7 @@ body {
 }
 
 .app-header h1 {
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -85,6 +85,24 @@ body {
 
 /* ── Two-column layout ────────────────────────────────────────────────────── */
 .app-main { padding: 0; flex: 1; }
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
 
 .two-column-layout {
   display: flex;
@@ -117,7 +135,7 @@ body {
 }
 
 label {
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 0.8rem;
   letter-spacing: 0.04em;
@@ -133,9 +151,9 @@ label {
   width: 100%;
   padding: 12px 20px;
   border: 1.5px solid rgba(20,20,19,0.2);
-  border-radius: var(--r-pill);
+  border-radius: 0;
   font-size: 0.95rem;
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 450;
   transition: border-color 0.2s, box-shadow 0.2s;
   background: var(--white);
@@ -144,7 +162,7 @@ label {
 }
 
 .input-textarea {
-  border-radius: var(--r-hero);
+  border-radius: 0;
   resize: vertical;
   min-height: 120px;
 }
@@ -168,12 +186,12 @@ label {
   padding: 12px 28px;
   font-size: 0.95rem;
   font-weight: 500;
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   letter-spacing: -0.02em;
   color: var(--canvas);
   background: var(--ink);
   border: 1.5px solid var(--ink);
-  border-radius: var(--r-btn);
+  border-radius: 0;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
   position: relative;
@@ -217,12 +235,12 @@ label {
   padding: 5px 14px;
   font-size: 0.78rem;
   font-weight: 600;
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   letter-spacing: -0.01em;
   color: var(--ink);
   background: var(--white);
   border: 1.5px solid var(--dust);
-  border-radius: var(--r-pill);
+  border-radius: 0;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
   white-space: nowrap;
@@ -247,7 +265,7 @@ label {
   /* Override to Signal Orange for the primary action */
   background: var(--signal);
   border-color: var(--signal);
-  border-radius: var(--r-pill);
+  border-radius: 0;
 }
 
 .btn-submit:hover:not(:disabled) {
@@ -262,7 +280,7 @@ label {
   background: var(--lifted);
   border: 1px solid rgba(20,20,19,0.1);
   border-left: 3px solid var(--ink);
-  border-radius: var(--r-hero);
+  border-radius: 0;
   color: var(--ink);
   font-size: 0.9rem;
   font-weight: 450;
@@ -278,7 +296,7 @@ label {
 .ai-config-section {
   background: var(--lifted);
   border: 1px solid rgba(20,20,19,0.1);
-  border-radius: var(--r-hero);
+  border-radius: 0;
   padding: 1.5rem 2rem;
   box-shadow: var(--shadow-nav);
 }
@@ -291,7 +309,7 @@ label {
 }
 
 .ai-config-title {
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -310,7 +328,7 @@ label {
   background: var(--ink);
   color: var(--canvas);
   padding: 3px 14px;
-  border-radius: var(--r-pill);
+  border-radius: 0;
   letter-spacing: -0.01em;
 }
 
@@ -342,7 +360,7 @@ label {
   justify-content: center;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: 0;
   background: var(--dust);
   color: var(--ink);
   font-size: 0.65rem;
@@ -369,7 +387,7 @@ label {
   font-weight: 450;
   line-height: 1.5;
   padding: 10px 14px;
-  border-radius: var(--r-btn);
+  border-radius: 0;
   width: 240px;
   white-space: normal;
   z-index: 100;
@@ -393,7 +411,7 @@ label {
 
 /* ── Guide box ────────────────────────────────────────────────────────────── */
 .guide-box h2 {
-  font-family: 'Sofia Sans', Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1.75rem;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -420,7 +438,7 @@ label {
 .img-example {
   width: 100%;
   margin: 1rem 0;
-  border-radius: var(--r-hero);
+  border-radius: 0;
   box-shadow: var(--shadow-card);
   transition: transform 0.3s ease;
 }
@@ -431,7 +449,7 @@ label {
   background: var(--white);
   border-left: 3px solid var(--arc);
   padding: 1rem 1.25rem;
-  border-radius: var(--r-btn);
+  border-radius: 0;
   color: var(--ink);
   font-size: 0.9rem;
   font-weight: 450;
@@ -450,3 +468,48 @@ label {
   .left-col, .right-col { padding: 2rem; }
   .app-header { padding: 1.5rem 2rem; }
 }
+
+/* ── New Utility Classes ────────────────────────────────────────────────── */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--slate);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-icon:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+}
+
+.routing-tip {
+  background-color: #e6f7ff;
+  color: #0050b3;
+  border-color: #91d5ff;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.tip-box.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+  margin-top: 10px;
+}
+
+

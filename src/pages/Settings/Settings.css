@@ -1,0 +1,39 @@
+.settings-page {
+  padding: 2rem;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.settings-card {
+  max-width: 600px;
+  width: 100%;
+  height: fit-content;
+}
+
+.settings-title {
+  font-family: 'Inter', sans-serif;
+  color: var(--ink, #141413);
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.settings-desc {
+  font-family: 'Inter', sans-serif;
+  color: var(--slate, #696969);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}

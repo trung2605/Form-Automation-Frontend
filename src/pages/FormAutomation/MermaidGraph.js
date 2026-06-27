@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify';
 
 mermaid.initialize({
   startOnLoad: false,
@@ -53,8 +54,8 @@ export default function MermaidGraph({ chart }) {
   return (
     <div
       ref={ref}
-      style={{ display: 'flex', justifyContent: 'center', padding: '10px', width: '100%', overflowX: 'auto' }}
-      dangerouslySetInnerHTML={{ __html: svgStr }}
+      style={{ display: 'flex', justifyContent: 'center', padding: '10px', width: '100%', overflowX: 'auto', minHeight: '300px' }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(svgStr) }}
     />
   );
 }

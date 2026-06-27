@@ -1,32 +1,59 @@
 import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import MermaidGraph from "./MermaidGraph";
 import "./FormConfigEditor.css";
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from "react-resizable-panels";
+import { FiLock, FiUnlock } from "react-icons/fi";
 
 function FieldCard({ entryKey, fieldData, onChange, cardRef, formRouting }) {
   const isChoice = fieldData.type === "choice" && Array.isArray(fieldData.options);
+  const [lockedIndices, setLockedIndices] = useState(new Set());
+
+  const toggleLock = (index) => {
+    setLockedIndices(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
 
   const handleWeightChange = (index, newPct) => {
     const options = fieldData.options;
     const newVal = Math.max(0, Math.min(100, newPct)) / 100;
     const oldVal = fieldData.weights[index];
     const delta = newVal - oldVal;
-    const otherIndices = options.map((_, i) => i).filter((i) => i !== index);
-    const otherSum = otherIndices.reduce((s, i) => s + fieldData.weights[i], 0);
+    
+    // Find unlocked indices that are NOT the one being changed
+    const otherUnlockedIndices = options
+        .map((_, i) => i)
+        .filter((i) => i !== index && !lockedIndices.has(i));
 
     const newWeights = [...fieldData.weights];
     newWeights[index] = newVal;
 
-    if (otherSum > 0) {
-      otherIndices.forEach((i) => {
-        newWeights[i] = Math.max(0, fieldData.weights[i] - delta * (fieldData.weights[i] / otherSum));
-      });
-    } else {
-      const share = (1 - newVal) / otherIndices.length;
-      otherIndices.forEach((i) => { newWeights[i] = share; });
+    if (otherUnlockedIndices.length > 0) {
+      const otherSum = otherUnlockedIndices.reduce((s, i) => s + fieldData.weights[i], 0);
+      if (otherSum > 0) {
+        otherUnlockedIndices.forEach((i) => {
+          newWeights[i] = Math.max(0, fieldData.weights[i] - delta * (fieldData.weights[i] / otherSum));
+        });
+      } else {
+        // distribute delta equally
+        const share = -delta / otherUnlockedIndices.length;
+        otherUnlockedIndices.forEach((i) => { newWeights[i] = Math.max(0, fieldData.weights[i] + share); });
+      }
     }
 
     const sum = newWeights.reduce((s, v) => s + v, 0);
-    const normalized = newWeights.map((w) => w / sum);
+    // Only normalize if there are no locks or if we want to force 1.0 sum.
+    // If we lock too many and the sum isn't 1.0, normalization breaks the lock.
+    // To be strictly correct, if we normalize, we change locked values.
+    // So we will only normalize to ensure total = 1 IF we can.
+    let normalized = newWeights;
+    if (sum > 0 && Math.abs(sum - 1) > 0.001) {
+       normalized = newWeights.map((w) => w / sum);
+    }
+
     onChange(entryKey, { ...fieldData, weights: normalized });
   };
 
@@ -44,10 +71,18 @@ function FieldCard({ entryKey, fieldData, onChange, cardRef, formRouting }) {
           {fieldData.options.map((opt, i) => {
             const raw = (fieldData.weights?.[i] ?? 1 / fieldData.options.length) * 100;
             const pctInt = Math.round(raw);
-            const pctDisplay = Number.isInteger(raw) ? raw.toFixed(0) : raw.toFixed(1);
+            const isLocked = lockedIndices.has(i);
+            
             return (
               <div key={i} className="option-row">
-                <span className="option-label">{opt}</span>
+                <button 
+                  className={`lock-btn ${isLocked ? 'locked' : ''}`} 
+                  onClick={() => toggleLock(i)}
+                  title={isLocked ? "Mở khóa" : "Khóa tỉ lệ"}
+                >
+                  {isLocked ? <FiLock size={14} /> : <FiUnlock size={14} />}
+                </button>
+                <span className="option-label" title={opt}>{opt}</span>
                 <input
                   type="range"
                   min={0}
@@ -55,8 +90,18 @@ function FieldCard({ entryKey, fieldData, onChange, cardRef, formRouting }) {
                   value={pctInt}
                   onChange={(e) => handleWeightChange(i, Number(e.target.value))}
                   className="weight-slider"
+                  disabled={isLocked}
                 />
-                <span className="weight-pct">{pctDisplay}%</span>
+                <input 
+                  type="number" 
+                  min={0} max={100} 
+                  value={pctInt} 
+                  onChange={(e) => handleWeightChange(i, Number(e.target.value))}
+                  className="weight-number-input"
+                  disabled={isLocked}
+                />
+                <span className="weight-pct">%</span>
+                
                 {fieldData.optionTargets && fieldData.optionTargets[opt] && fieldData.optionTargets[opt] !== '-2' && (
                   <span className="routing-badge" title={`Option này dẫn tới nhánh ${fieldData.optionTargets[opt]}`}>
                     {fieldData.optionTargets[opt] === '0' || fieldData.optionTargets[opt] === '-1' ? '➔ Gửi Form' : '➔ Nhảy nhánh'}
@@ -92,12 +137,7 @@ function WeightTotal({ weights }) {
 }
 
 export default function FormConfigEditor({ formConfig, onChange, formRouting = [] }) {
-  const [navWidth, setNavWidth] = useState(260); // px
-  const [panelWidth, setPanelWidth] = useState(55); // flex %
   const [activeKey, setActiveKey] = useState(null);
-  const draggingNav = useRef(false);
-  const draggingCenter = useRef(false);
-  const containerRef = useRef(null);
   const cardRefs = useRef({});
   const listRef = useRef(null);
   const [rightTab, setRightTab] = useState("flowchart"); // "json" or "flowchart"
@@ -110,7 +150,7 @@ export default function FormConfigEditor({ formConfig, onChange, formRouting = [
   const mermaidCode = useMemo(() => {
     if (!formRouting || !formRouting.length || !parsed) return '';
     let md = 'graph TD\n';
-    md += '  classDef normalQ fill:#FFFFFF,stroke:#D1CDC7,stroke-width:1px,color:#141413,rx:8px,ry:8px;\n';
+    md += '  classDef normalQ fill:#FFFFFF,stroke:#D1CDC7,stroke-width:1px,color:#141413,rx:0px,ry:0px;\n';
     md += '  classDef branchQ fill:#FCFBFA,stroke:#F37338,stroke-width:2px,color:#CF4500;\n';
     md += '  classDef endNode fill:#F37338,stroke:#CF4500,stroke-width:2px,color:#FFFFFF;\n';
     md += '  classDef emptyPage fill:#F3F0EE,stroke:#D1CDC7,stroke-width:1px,color:#696969,stroke-dasharray: 5 5;\n';
@@ -227,52 +267,6 @@ export default function FormConfigEditor({ formConfig, onChange, formRouting = [
     }
   };
 
-  const onMouseDownNav = (e) => {
-    e.preventDefault();
-    draggingNav.current = true;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-  };
-
-  const onMouseDownCenter = (e) => {
-    e.preventDefault();
-    draggingCenter.current = true;
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
-  };
-
-  useEffect(() => {
-    const onMouseMove = (e) => {
-      if (!containerRef.current) return;
-      if (!draggingNav.current && !draggingCenter.current) return;
-      
-      const rect = containerRef.current.getBoundingClientRect();
-      
-      if (draggingNav.current) {
-        let newNav = e.clientX - rect.left;
-        setNavWidth(Math.max(150, Math.min(600, newNav)));
-      } else if (draggingCenter.current) {
-        const startX = rect.left + navWidth + 8;
-        const availableWidth = rect.width - navWidth - 16;
-        const relativeX = e.clientX - startX;
-        const pct = (relativeX / availableWidth) * 100;
-        setPanelWidth(Math.max(15, Math.min(85, pct)));
-      }
-    };
-    const onMouseUp = () => {
-      draggingNav.current = false;
-      draggingCenter.current = false;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [navWidth]);
-
   useEffect(() => {
     const leftPanel = listRef.current;
     if (!leftPanel) return;
@@ -291,76 +285,113 @@ export default function FormConfigEditor({ formConfig, onChange, formRouting = [
   }, [entries]);
 
   return (
-    <div className="config-editor-wrapper" ref={containerRef}>
-      <div className="config-nav" style={{ width: `${navWidth}px` }}>
-        <div className="panel-label">Câu hỏi</div>
-        <div className="config-nav-list">
-          {entries.map(([key, field], idx) => {
-            const displayLabel = field.label || key;
-            return (
-              <button
+    <div className="config-editor-wrapper">
+      <PanelGroup direction="horizontal" className="panel-group-desktop">
+        <Panel defaultSize={20} minSize={15} maxSize={40} className="config-nav">
+          <div className="panel-label">Câu hỏi</div>
+          <div className="config-nav-list">
+            {entries.map(([key, field], idx) => {
+              const displayLabel = field.label || key;
+              return (
+                <button
+                  key={key}
+                  className={`nav-item ${activeKey === key ? "active" : ""}`}
+                  onClick={(e) => { e.preventDefault(); scrollToCard(key); }}
+                  title={displayLabel}
+                >
+                  <span className="nav-index">{idx + 1}</span>
+                  <span className="nav-label">{displayLabel}</span>
+                </button>
+              );
+            })}
+          </div>
+        </Panel>
+
+        <PanelResizeHandle className="resize-handle" />
+
+        <Panel defaultSize={40} minSize={30} className="config-left" ref={listRef}>
+          <div className="panel-label">Cấu hình trực quan</div>
+          {parsed ? (
+            entries.map(([key, field]) => (
+              <FieldCard
                 key={key}
-                className={`nav-item ${activeKey === key ? "active" : ""}`}
-                onClick={() => scrollToCard(key)}
-                title={displayLabel}
-              >
-                <span className="nav-index">{idx + 1}</span>
-                <span className="nav-label">{displayLabel}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="resize-handle" onMouseDown={onMouseDownNav}>
-        <div className="resize-grip" />
-      </div>
-
-      <div className="config-left" style={{ flex: panelWidth }} ref={listRef}>
-        <div className="panel-label">Cấu hình trực quan</div>
-        {parsed ? (
-          entries.map(([key, field]) => (
-            <FieldCard
-              key={key}
-              entryKey={key}
-              fieldData={field}
-              onChange={handleFieldChange}
-              cardRef={(el) => { cardRefs.current[key] = el; }}
-              formRouting={formRouting}
-            />
-          ))
-        ) : (
-          <p className="parse-error">JSON không hợp lệ</p>
-        )}
-      </div>
-
-      <div className="resize-handle" onMouseDown={onMouseDownCenter}>
-        <div className="resize-grip" />
-      </div>
-
-      <div className="config-right" style={{ flex: 100 - panelWidth, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', borderBottom: '1px solid #d9d9d9' }}>
-          <button 
-            className={`tab-button ${rightTab === 'flowchart' ? 'active' : ''}`}
-            onClick={() => setRightTab('flowchart')}
-            style={{ flex: 1, padding: '8px', border: 'none', background: rightTab === 'flowchart' ? '#FFFFFF' : '#F3F0EE', cursor: 'pointer', borderRight: '1px solid #D1CDC7', fontWeight: rightTab === 'flowchart' ? '700' : '500', color: rightTab === 'flowchart' ? '#CF4500' : 'inherit' }}
-          >
-            Sơ đồ rẽ nhánh
-          </button>
-          <button 
-            className={`tab-button ${rightTab === 'json' ? 'active' : ''}`}
-            onClick={() => setRightTab('json')}
-            style={{ flex: 1, padding: '8px', border: 'none', background: rightTab === 'json' ? '#FFFFFF' : '#F3F0EE', cursor: 'pointer', fontWeight: rightTab === 'json' ? '700' : '500', color: rightTab === 'json' ? '#CF4500' : 'inherit' }}
-          >
-            JSON (read-only)
-          </button>
-        </div>
-        <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#fff' }}>
-          {rightTab === 'json' ? (
-            <pre className="json-preview" style={{ height: '100%', margin: 0 }}>{formConfig}</pre>
+                entryKey={key}
+                fieldData={field}
+                onChange={handleFieldChange}
+                cardRef={(el) => { cardRefs.current[key] = el; }}
+                formRouting={formRouting}
+              />
+            ))
           ) : (
-            <MermaidGraph chart={mermaidCode} />
+            <p className="parse-error">JSON không hợp lệ</p>
           )}
+        </Panel>
+
+        <PanelResizeHandle className="resize-handle" />
+
+        <Panel defaultSize={40} minSize={20} className="config-right" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="tab-header">
+            <button 
+              type="button"
+              className={`tab-button ${rightTab === 'flowchart' ? 'active' : ''}`}
+              onClick={() => setRightTab('flowchart')}
+            >
+              Sơ đồ rẽ nhánh
+            </button>
+            <button 
+              type="button"
+              className={`tab-button ${rightTab === 'json' ? 'active' : ''}`}
+              onClick={() => setRightTab('json')}
+            >
+              JSON (read-only)
+            </button>
+          </div>
+          <div className="tab-content">
+            {rightTab === 'json' ? (
+              <pre className="json-preview">{formConfig}</pre>
+            ) : (
+              <MermaidGraph chart={mermaidCode} />
+            )}
+          </div>
+        </Panel>
+      </PanelGroup>
+      
+      {/* Mobile Fallback - Stacked layout */}
+      <div className="panel-group-mobile">
+        <div className="config-left" style={{ flex: 1, minHeight: '400px', maxHeight: '500px' }}>
+          <div className="panel-label">Cấu hình trực quan</div>
+          {parsed ? (
+            entries.map(([key, field]) => (
+              <FieldCard
+                key={key}
+                entryKey={key}
+                fieldData={field}
+                onChange={handleFieldChange}
+                cardRef={(el) => { cardRefs.current[key] = el; }}
+                formRouting={formRouting}
+              />
+            ))
+          ) : (
+            <p className="parse-error">JSON không hợp lệ</p>
+          )}
+        </div>
+        <div className="config-right" style={{ flex: 1, minHeight: '400px' }}>
+            {/* Mermaid Graph or JSON */}
+            <div className="tab-header">
+              <button type="button" className={`tab-button ${rightTab === 'flowchart' ? 'active' : ''}`} onClick={() => setRightTab('flowchart')}>
+                Sơ đồ rẽ nhánh
+              </button>
+              <button type="button" className={`tab-button ${rightTab === 'json' ? 'active' : ''}`} onClick={() => setRightTab('json')}>
+                JSON (read-only)
+              </button>
+            </div>
+            <div className="tab-content">
+              {rightTab === 'json' ? (
+                <pre className="json-preview">{formConfig}</pre>
+              ) : (
+                <MermaidGraph chart={mermaidCode} />
+              )}
+            </div>
         </div>
       </div>
     </div>
