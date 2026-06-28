@@ -11,8 +11,40 @@ import TagInput from "../../components/ui/TagInput";
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import axiosClient from '../../services/axiosClient';
+import MacbookMockup from "../../components/Mockups/MacbookMockup";
 
-const defaultFormConfig = {};
+const defaultFormConfig = {
+  "entry.12345": {
+    "type": "email",
+    "label": "Email của bạn là gì?"
+  },
+  "entry.67890": {
+    "type": "choice",
+    "label": "Bạn đánh giá dịch vụ thế nào?",
+    "options": ["Tuyệt vời", "Bình thường", "Tệ"],
+    "weights": [0.7, 0.2, 0.1],
+    "optionTargets": {
+      "Tuyệt vời": "-1",
+      "Bình thường": "-1",
+      "Tệ": "page_2"
+    }
+  },
+  "entry.11111": {
+    "type": "text",
+    "label": "Lý do bạn chưa hài lòng?"
+  }
+};
+
+const defaultFormRouting = [
+  {
+    "page_id": "page_1",
+    "entries": ["entry.12345", "entry.67890"]
+  },
+  {
+    "page_id": "page_2",
+    "entries": ["entry.11111"]
+  }
+];
 
 function Tooltip({ text }) {
   // We'll replace this with tippy later if needed, or keep for simple use cases
@@ -34,7 +66,7 @@ function FormAutomationTool() {
     JSON.stringify(defaultFormConfig, null, 2)
   );
   const [hiddenFields, setHiddenFields] = useState({});
-  const [formRouting, setFormRouting] = useState([]);
+  const [formRouting, setFormRouting] = useState(defaultFormRouting);
   
   const [loadingAnalyze, setLoadingAnalyze] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -273,7 +305,7 @@ function FormAutomationTool() {
             <button
               type="submit"
               disabled={loadingSubmit || !submitUrl}
-              className="btn-signal btn-submit"
+              className="btn-ink btn-submit"
             >
               {loadingSubmit ? (
                 <><FiLoader className="spin" style={{marginRight: '8px'}} /> Đang gửi {progress.current}/{progress.total}</>
@@ -283,43 +315,45 @@ function FormAutomationTool() {
         </div>
 
         <div>
-          <div className="guide-card">
-            <h2>Hướng dẫn sử dụng nhanh</h2>
-            <ol>
-              <li>
-                Lấy URL của Google Form bạn muốn điền (đường link kết thúc bằng <b>/viewform</b>).
-              </li>
-              <li>
-                Dán URL vào ô <b>Google Form URL</b> và nhấn <b>Phân tích Form</b>.
-              </li>
-              <li>
-                Đợi hệ thống tải cấu trúc của biểu mẫu. Quá trình này có thể mất chút thời gian tùy thuộc vào độ phức tạp của Form và AI Provider.
-              </li>
-              <li>
-                Tùy chỉnh tỷ lệ (weight) các đáp án ở khung Cấu hình trực quan. 
-              </li>
-              <li>
-                Nhập danh sách Email và thiết lập số lần gửi mong muốn.
-              </li>
-              <li>Cuối cùng nhấn <b>Bắt đầu Gửi Form</b> để hoàn tất.</li>
-            </ol>
-            <div className="tip-box warning">
-              <b>Lỗi 400 Bad Request:</b> Nếu biểu mẫu có phân nhánh (nhảy qua một trang dựa trên câu trả lời), hãy chú ý set % về 0 đối với các đáp án kết thúc form ngay lập tức nếu bạn muốn script chạy toàn bộ các trang.
-            </div>
-            <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid rgba(255,255,255,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <h3 style={{ fontSize: '18px', color: 'var(--white)', margin: 0 }}>Cấu hình Nâng cao</h3>
-                {aiProvider ? (
-                   <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>AI đang dùng: <b style={{ color: 'var(--white)' }}>{aiProvider}</b></span>
-                ) : (
-                   <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Bạn có thể thêm API Key để tự động phân tích cấu trúc Form</span>
-                )}
+          <MacbookMockup>
+            <div className="guide-card" style={{ height: '100%', overflowY: 'auto', borderRadius: 0, padding: '32px' }}>
+              <h2>Hướng dẫn sử dụng nhanh</h2>
+              <ol>
+                <li>
+                  Lấy URL của Google Form bạn muốn điền (đường link kết thúc bằng <b>/viewform</b>).
+                </li>
+                <li>
+                  Dán URL vào ô <b>Google Form URL</b> và nhấn <b>Phân tích Form</b>.
+                </li>
+                <li>
+                  Đợi hệ thống tải cấu trúc của biểu mẫu. Quá trình này có thể mất chút thời gian tùy thuộc vào độ phức tạp của Form và AI Provider.
+                </li>
+                <li>
+                  Tùy chỉnh tỷ lệ (weight) các đáp án ở khung Cấu hình trực quan. 
+                </li>
+                <li>
+                  Nhập danh sách Email và thiết lập số lần gửi mong muốn.
+                </li>
+                <li>Cuối cùng nhấn <b>Bắt đầu Gửi Form</b> để hoàn tất.</li>
+              </ol>
+              <div className="tip-box warning">
+                <b>Lỗi 400 Bad Request:</b> Nếu biểu mẫu có phân nhánh (nhảy qua một trang dựa trên câu trả lời), hãy chú ý set % về 0 đối với các đáp án kết thúc form ngay lập tức nếu bạn muốn script chạy toàn bộ các trang.
               </div>
-              <Link to="/settings" className="btn-sample" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', backgroundColor: 'var(--white)', color: 'var(--ink-black)' }}>
-                <FiSettings size={18} /> Mở Cài đặt
-              </Link>
+              <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid rgba(255,255,255,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <h3 style={{ fontSize: '18px', color: 'var(--white)', margin: 0 }}>Cấu hình Nâng cao</h3>
+                  {aiProvider ? (
+                     <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>AI đang dùng: <b style={{ color: 'var(--white)' }}>{aiProvider}</b></span>
+                  ) : (
+                     <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Bạn có thể thêm API Key để tự động phân tích cấu trúc Form</span>
+                  )}
+                </div>
+                <Link to="/settings" className="btn-sample" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', backgroundColor: 'var(--white)', color: 'var(--ink-black)' }}>
+                  <FiSettings size={18} /> Mở Cài đặt
+                </Link>
+              </div>
             </div>
-          </div>
+          </MacbookMockup>
         </div>
       </main>
     </div>

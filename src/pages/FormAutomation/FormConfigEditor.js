@@ -288,7 +288,7 @@ useEffect(() => {
   return (
     <div className="config-editor-wrapper">
       <PanelGroup direction="horizontal" className="panel-group-desktop">
-        <Panel defaultSize={20} minSize={15} maxSize={40} className="config-nav">
+        <Panel defaultSize={25} minSize={15} maxSize={40} className="config-nav">
           <div className="panel-label">Câu hỏi</div>
           <div className="config-nav-list">
             {entries.map(([key, field], idx) => {

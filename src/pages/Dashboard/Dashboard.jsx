@@ -107,7 +107,6 @@ export default function Dashboard() {
       {/* Search and Filters Section */}
       <div className="tools-controls">
         <div className="search-bar-wrapper">
-          <IconSearch className="search-icon" />
           <input 
             type="text" 
             placeholder="Tìm kiếm công cụ..." 

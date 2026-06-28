@@ -157,7 +157,7 @@
 
 /* Breadcrumbs */
 .mc-breadcrumbs-container {
-  padding: 100px 2rem 1rem;
+  padding: 140px 2rem 1rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -198,7 +198,7 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem 4rem;
+  padding: 2rem 2rem 4rem;
 }
 
 .mc-footer {

@@ -148,28 +148,33 @@
 
 /* Resize handle */
 .resize-handle {
-  width: 8px;
-  background: rgba(20,20,19,0.04);
+  width: 16px;
+  background: rgba(20,20,19,0.02);
   cursor: col-resize;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background 0.15s;
-  border-left: 1px solid rgba(20,20,19,0.08);
-  border-right: 1px solid rgba(20,20,19,0.08);
+  transition: background 0.2s;
   position: relative;
+  z-index: 10;
 }
 
-.resize-handle:hover { background: rgba(20,20,19,0.1); }
+.resize-handle:hover, .resize-handle:active { 
+  background: rgba(20,20,19,0.08); 
+}
 
 .resize-handle::after {
   content: '';
-  width: 2px;
-  height: 32px;
+  width: 4px;
+  height: 48px;
   background: #D1CDC7;
-  border-radius: 0;
-  position: absolute;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.resize-handle:hover::after, .resize-handle:active::after {
+  background: #F37338;
 }
 
 /* Field card */
