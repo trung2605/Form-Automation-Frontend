@@ -267,7 +267,8 @@ export default function FormConfigEditor({ formConfig, onChange, formRouting = [
     }
   };
 
-  useEffect(() => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
     const leftPanel = listRef.current;
     if (!leftPanel) return;
     const handler = () => {

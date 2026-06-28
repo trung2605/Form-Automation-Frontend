@@ -1,6 +1,5 @@
 // src/App.js
 import React, { useState } from "react";
-import axios from "axios";
 import "./FormAutomationTool.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,9 +8,9 @@ import { FiSettings, FiLoader } from "react-icons/fi";
 import FormConfigEditor from "./FormConfigEditor";
 import SAMPLE_EMAILS from "./sampleEmails";
 import TagInput from "../../components/ui/TagInput";
-import Aurora from "../../components/Aurora/Aurora";
-import SpotlightCard from "../../components/SpotlightCard/SpotlightCard";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthContext';
+import axiosClient from '../../services/axiosClient';
 
 const defaultFormConfig = {};
 
@@ -40,6 +39,8 @@ function FormAutomationTool() {
   const [loadingAnalyze, setLoadingAnalyze] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const { user, refreshWallet } = React.useContext(AuthContext);
+  const navigate = useNavigate();
   
   const [aiProvider, setAiProvider] = useState("");
 
@@ -68,9 +69,6 @@ function FormAutomationTool() {
     }
   };
 
-  // const API_URL = "https://form-automation-backend.onrender.com";
-  const API_URL = "http://127.0.0.1:5000";
-
   const handleAnalyze = async () => {
     if (!formUrl) {
       toast.error("Vui lòng nhập Form URL trước khi phân tích!");
@@ -82,7 +80,7 @@ function FormAutomationTool() {
     toast.info("Đang phân tích biểu mẫu...", { autoClose: 2000 });
     
     try {
-      const response = await axios.post(`${API_URL}/api/analyze-form`, {
+      const response = await axiosClient.post(`/forms/analyze-form`, {
         formUrl,
         geminiKey: geminiKey || undefined,
         openaiKey: openaiKey || undefined,
@@ -135,7 +133,7 @@ function FormAutomationTool() {
     try {
       const parsedFormConfig = JSON.parse(formConfig);
       const emailList = emails.map(e => e.value);
-      const response = await axios.post(`${API_URL}/api/fill-form`, {
+      const response = await axiosClient.post(`/forms/fill-form`, {
         formUrl,
         submitUrl,
         emails: emailList,
@@ -148,32 +146,36 @@ function FormAutomationTool() {
       
       toast.success(response.data.message || "Đã gửi form thành công!");
       setProgress({ current: response.data.successes || Number(count), total: Number(count) });
+      refreshWallet(); // Update wallet balance in UI
     } catch (error) {
-      toast.error("Lỗi khi gửi biểu mẫu: " + (error.response?.data?.error || error.message));
+      if (error.response?.status === 402) {
+         toast.error(error.response.data.error || "Số dư ví không đủ. Vui lòng nạp thêm Credits!");
+      } else if (error.response?.status === 401) {
+         toast.error("Vui lòng đăng nhập lại để tiếp tục!");
+         navigate('/login');
+      } else if (error.response?.status === 403) {
+         toast.error(error.response.data.error || "Tài khoản của bạn đã bị khóa tính năng này.");
+      } else {
+         toast.error("Lỗi khi gửi biểu mẫu: " + (error.response?.data?.error || error.message));
+      }
     } finally {
       setLoadingSubmit(false);
     }
   };
 
   return (
-    <div className="app-container">
+    <div className="form-automation-page animate-slide-up">
       <ToastContainer position="bottom-right" theme="colored" />
 
-      <header className="app-header">
-        <h1>FORM AUTOMATION</h1>
-        <p>Kiến trúc hệ thống mới</p>
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
-          {aiProvider && (
-             <span className="ai-provider-badge">Đang dùng: {aiProvider}</span>
-          )}
-          <Link to="/settings" className="btn-icon" title="Cài đặt AI">
-            <FiSettings size={22} />
-          </Link>
+      <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>FORM AUTOMATION</h1>
+          <p>Kiến trúc hệ thống mới</p>
         </div>
       </header>
 
-      <main className="app-main two-column-layout">
-        <div className="left-col">
+      <main className="automation-content">
+        <div className="form-card glass-panel">
           <form onSubmit={handleSubmit} className="form-layout">
             
             <div className="form-group">
@@ -185,14 +187,14 @@ function FormAutomationTool() {
                   value={formUrl}
                   onChange={(e) => setFormUrl(e.target.value)}
                   placeholder="https://docs.google.com/forms/d/e/xxx/viewform"
-                  className="input-text"
+                  className="input-mc"
                   required
                 />
                 <button
                   type="button"
                   onClick={handleAnalyze}
                   disabled={loadingAnalyze || !formUrl}
-                  className="btn-primary"
+                  className="btn-ink"
                   style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                   {loadingAnalyze ? <><FiLoader className="spin" /> Đang phân tích</> : "Phân tích Form"}
@@ -207,7 +209,7 @@ function FormAutomationTool() {
                 type="text"
                 value={submitUrl}
                 readOnly
-                className="input-text read-only"
+                className="input-mc read-only"
                 placeholder="Tự động điền sau khi phân tích..."
               />
             </div>
@@ -241,7 +243,7 @@ function FormAutomationTool() {
                   value={count}
                   onChange={(e) => setCount(e.target.value)}
                   min="1"
-                  className="input-text"
+                  className="input-mc"
                   required
                 />
               </div>
@@ -254,7 +256,7 @@ function FormAutomationTool() {
                   value={maxDelay}
                   onChange={(e) => setMaxDelay(e.target.value)}
                   min="0"
-                  className="input-text"
+                  className="input-mc"
                   required
                 />
               </div>
@@ -271,7 +273,7 @@ function FormAutomationTool() {
             <button
               type="submit"
               disabled={loadingSubmit || !submitUrl}
-              className="btn-primary btn-submit"
+              className="btn-signal btn-submit"
             >
               {loadingSubmit ? (
                 <><FiLoader className="spin" style={{marginRight: '8px'}} /> Đang gửi {progress.current}/{progress.total}</>
@@ -280,8 +282,8 @@ function FormAutomationTool() {
           </form>
         </div>
 
-        <div className="right-col">
-          <SpotlightCard className="guide-box" spotlightColor="rgba(243, 115, 56, 0.15)">
+        <div>
+          <div className="guide-card">
             <h2>Hướng dẫn sử dụng nhanh</h2>
             <ol>
               <li>
@@ -304,7 +306,20 @@ function FormAutomationTool() {
             <div className="tip-box warning">
               <b>Lỗi 400 Bad Request:</b> Nếu biểu mẫu có phân nhánh (nhảy qua một trang dựa trên câu trả lời), hãy chú ý set % về 0 đối với các đáp án kết thúc form ngay lập tức nếu bạn muốn script chạy toàn bộ các trang.
             </div>
-          </SpotlightCard>
+            <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid rgba(255,255,255,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <h3 style={{ fontSize: '18px', color: 'var(--white)', margin: 0 }}>Cấu hình Nâng cao</h3>
+                {aiProvider ? (
+                   <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>AI đang dùng: <b style={{ color: 'var(--white)' }}>{aiProvider}</b></span>
+                ) : (
+                   <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>Bạn có thể thêm API Key để tự động phân tích cấu trúc Form</span>
+                )}
+              </div>
+              <Link to="/settings" className="btn-sample" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', backgroundColor: 'var(--white)', color: 'var(--ink-black)' }}>
+                <FiSettings size={18} /> Mở Cài đặt
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
     </div>

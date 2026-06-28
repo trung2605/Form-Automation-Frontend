@@ -1,0 +1,57 @@
+﻿.iphone-mockup {
+  width: 320px;
+  height: 650px;
+  background: #1c1c1e;
+  border-radius: 40px;
+  padding: 12px;
+  margin: 0 auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 2px #3a3a3c, inset 0 0 0 6px #000;
+  position: relative;
+  transform: rotateX(5deg) rotateY(15deg);
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+.iphone-mockup:hover {
+  transform: rotateX(0deg) rotateY(0deg);
+}
+
+.iphone-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--canvas-cream);
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+}
+
+.iphone-dynamic-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 30px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 10px;
+}
+
+.island-camera {
+  width: 12px;
+  height: 12px;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 50%;
+  box-shadow: inset 0 0 2px rgba(255,255,255,0.1);
+}
+
+.iphone-content {
+  width: 100%;
+  height: 100%;
+  padding-top: 50px; /* Space for dynamic island */
+}

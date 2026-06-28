@@ -1,56 +1,101 @@
 import React from 'react';
 import './About.css';
-import SpotlightCard from '../../components/SpotlightCard/SpotlightCard';
+import { FiArrowRight } from "react-icons/fi";
 
 export default function About() {
   return (
-    <div className="about-page">
-      <SpotlightCard className="about-card" spotlightColor="rgba(243, 115, 56, 0.1)">
-        <h1 className="about-title">Giới Thiệu FORM AUTOMATION</h1>
+    <div className="news-page animate-slide-up">
+      <div className="news-header animate-slide-up">
+        <h1>News and trends</h1>
+        <p>Insights, updates, and deep dives into Form Automation and the future of data entry.</p>
+      </div>
+
+      {/* Hero Featured Article */}
+      <article className="featured-article animate-slide-up delay-100">
+        <div className="featured-image-container">
+          {/* Using a rich solid color block as placeholder, or a gradient matching Mastercard styling */}
+          <div className="featured-image" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}></div>
+        </div>
+        <div className="featured-content">
+          <div className="eyebrow">
+            <span className="eyebrow-dot">•</span>
+            FEATURED UPDATE
+          </div>
+          <h2>Introducing Form Routing Engine</h2>
+          <p>
+            Bạn mệt mỏi với việc điền Google Form thủ công? FORM AUTOMATION là giải pháp web mạnh mẽ giúp bạn tự động hóa hoàn toàn quy trình này. Hệ thống tự động nhận diện các nhánh (rẽ trang), giúp tự động hóa dễ dàng và vượt qua mọi rào cản.
+          </p>
+          <div>
+            <button className="btn-ink">Read the story</button>
+          </div>
+        </div>
+      </article>
+
+      {/* Article Grid */}
+      <section className="news-grid-section animate-slide-up delay-200">
+        <h2 className="section-title">Latest insights</h2>
         
-        <p className="about-desc">
-          Bạn mệt mỏi với việc điền Google Form thủ công? <b>FORM AUTOMATION</b> là giải pháp web mạnh mẽ giúp bạn tự động hóa hoàn toàn quy trình này. Được thiết kế để đơn giản hóa công việc lặp lại, ứng dụng của chúng tôi giúp bạn điền và gửi hàng loạt Google Form một cách nhanh chóng và chính xác. ✨
+        <div className="article-grid">
+          {/* Article 1 */}
+          <article className="article-card">
+            <div className="article-image-wrapper">
+              <div className="article-image" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' }}></div>
+            </div>
+            <div className="eyebrow">
+              <span className="eyebrow-dot" style={{ color: 'var(--link-blue)' }}>•</span>
+              TECHNOLOGY
+            </div>
+            <h3>Sức mạnh của trí tuệ nhân tạo trong phân tích Form</h3>
+            <p>
+              Chỉ cần dán mã nguồn HTML, công cụ của chúng tôi sẽ sử dụng AI để nhận diện toàn bộ cấu trúc form. Điều này giúp loại bỏ hoàn toàn các lỗi nhập liệu thủ công.
+            </p>
+          </article>
+
+          {/* Article 2 */}
+          <article className="article-card">
+            <div className="article-image-wrapper">
+              <div className="article-image" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}></div>
+            </div>
+            <div className="eyebrow">
+              <span className="eyebrow-dot" style={{ color: '#f59e0b' }}>•</span>
+              PRODUCTIVITY
+            </div>
+            <h3>Gửi hàng loạt với tùy biến linh hoạt</h3>
+            <p>
+              Dễ dàng điều chỉnh từng trường dữ liệu, từ việc nhập email tuần tự cho đến chọn ngẫu nhiên các câu trả lời theo tỷ lệ (weight) mong muốn.
+            </p>
+          </article>
+
+          {/* Article 3 */}
+          <article className="article-card">
+            <div className="article-image-wrapper">
+              <div className="article-image" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' }}></div>
+            </div>
+            <div className="eyebrow">
+              <span className="eyebrow-dot" style={{ color: '#ef4444' }}>•</span>
+              BEST PRACTICES
+            </div>
+            <h3>Hướng dẫn sử dụng nhanh Form Automation</h3>
+            <p>
+              Các bước đơn giản để lấy mã nguồn (Ctrl+U), phân tích cấu trúc, cấu hình email và bắt đầu tự động hóa hàng ngàn bản ghi dữ liệu an toàn.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      {/* Developer Info Panel */}
+      <section className="developer-panel animate-slide-up delay-400">
+        <div className="eyebrow" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <span className="eyebrow-dot" style={{ color: 'var(--canvas-cream)' }}>•</span>
+          BEHIND THE SCENES
+        </div>
+        <h2>Đội ngũ Phát triển</h2>
+        <p>
+          Được phát triển bởi <b>Lê Trí Trung</b>, sử dụng ReactJS ở frontend, Python (Flask) ở backend và API Gemini của Google để nhận diện dữ liệu thông minh. Mọi đóng góp hoặc báo lỗi đều được chào đón trên GitHub!
         </p>
-        
-        <hr className="about-divider" />
+        <button className="btn-outline" style={{ marginTop: '16px' }}>View on GitHub <FiArrowRight /></button>
+      </section>
 
-        <h2 className="about-section-title">Tại Sao Bạn Nên Chọn FORM AUTOMATION?</h2>
-        <ul className="about-list">
-          <li><b>Tiết Kiệm Thời Gian Vượt Trội:</b> Chuyển từ việc điền từng form một sang tự động gửi hàng loạt chỉ với vài cú nhấp chuột, giải phóng thời gian quý báu của bạn. ⏱️</li>
-          <li><b>Độ Chính Xác Cao:</b> Loại bỏ lỗi nhập liệu thủ công. Hệ thống tự động phân tích và điền dữ liệu theo cấu hình bạn đã thiết lập. ✅</li>
-          <li><b>Tùy Biến Linh Hoạt:</b> Dễ dàng điều chỉnh từng trường dữ liệu, từ việc nhập email tuần tự cho đến chọn ngẫu nhiên các câu trả lời. ⚙️</li>
-        </ul>
-
-        <hr className="about-divider" />
-
-        <h2 className="about-section-title">Tính Năng Nổi Bật</h2>
-        <ul className="about-list">
-          <li><b>Phân Tích Form Thông Minh:</b> Chỉ cần dán mã nguồn HTML, công cụ của chúng tôi sẽ sử dụng trí tuệ nhân tạo để phân tích và nhận diện toàn bộ cấu trúc form. 🤖</li>
-          <li><b>Điền và Gửi Hàng Loạt:</b> Hỗ trợ gửi form tự động với số lượng tùy chỉnh, sử dụng danh sách email và dữ liệu đầu vào đã được cấu hình. 🚀</li>
-          <li><b>Cấu Hình Dữ Liệu Chuyên Sâu:</b> Kiểm soát hoàn toàn cách dữ liệu được điền vào từng trường (văn bản, lựa chọn, hộp kiểm), cho phép bạn tùy chỉnh mọi chi tiết. 📊</li>
-          <li><b>Giao Diện Trực Quan:</b> Giao diện người dùng được thiết kế tối giản, dễ sử dụng, với hướng dẫn từng bước chi tiết giúp bạn bắt đầu ngay lập tức. 🎨</li>
-          <li><b>Nền Tảng Đáng Tin Cậy:</b> Kết hợp sức mạnh của ReactJS ở frontend và Python ở backend để đảm bảo hiệu suất và sự ổn định. 🔗</li>
-        </ul>
-
-        <hr className="about-divider" />
-
-        <h2 className="about-section-title">Hướng Dẫn Sử Dụng Nhanh</h2>
-        <ol className="about-list">
-          <li><b>Sao Chép Mã Nguồn:</b> Mở Google Form, nhấn chuột phải và chọn <b>"Xem nguồn trang" (hoặc Ctrl+U)</b>, sau đó sao chép toàn bộ nội dung. 📋</li>
-          <li><b>Dán và Phân Tích:</b> Dán mã nguồn vào ô tương ứng trên ứng dụng và nhấn <b>"Phân tích Form"</b> để hệ thống tự động trích xuất các trường. 🔍</li>
-          <li><b>Cấu Hình:</b> Nhập URL View Form, danh sách email và tùy chỉnh cấu hình dữ liệu nếu cần. ✏️</li>
-          <li><b>Gửi:</b> Nhấn <b>"Gửi Form"</b> để bắt đầu quá trình tự động. 📩</li>
-        </ol>
-
-        <hr className="about-divider" />
-
-        <h2 className="about-section-title">Thông Tin Dự Án</h2>
-        <ul className="about-list">
-          <li><b>Người Phát Triển:</b> Lê Trí Trung</li>
-          <li><b>Công Nghệ:</b> Frontend: ReactJS | Backend: Python (Flask) | API: Gemini (Google)</li>
-          <li><b>Đóng Góp:</b> Mọi ý kiến, báo lỗi hoặc pull request đều được chào đón trên GitHub. 🤝</li>
-        </ul>
-      </SpotlightCard>
     </div>
   );
 }
