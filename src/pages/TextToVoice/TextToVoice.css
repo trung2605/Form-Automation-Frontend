@@ -1,0 +1,182 @@
+/* TextToVoice.css */
+/* btn-ink, btn-outline, input-mc, glass-panel, animate-slide-up — from index.css */
+
+.ttv-page {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 80px 0 40px;
+}
+
+.ttv-page .page-header h1 {
+  font-size: 64px;
+  font-weight: 500;
+  letter-spacing: -1.28px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.ttv-page .page-header p {
+  font-size: 24px;
+  font-weight: 450;
+  color: var(--charcoal);
+  max-width: 640px;
+}
+
+.ttv-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.ttv-card,
+.ttv-result {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ttv-card .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ttv-card label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--charcoal);
+}
+
+/* Voice picker grid */
+.ttv-voice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.ttv-voice-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1.5px solid rgba(20, 20, 19, 0.15);
+  border-radius: 18px;
+  background: var(--white);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.ttv-voice-card:hover { border-color: var(--light-signal-orange); }
+
+.ttv-voice-card.active {
+  border-color: var(--signal-orange);
+  background: rgba(207, 69, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(207, 69, 0, 0.12);
+}
+
+.ttv-voice-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(20, 20, 19, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--ink-black);
+  flex-shrink: 0;
+}
+
+.ttv-voice-card.active .ttv-voice-icon {
+  background: var(--signal-orange);
+  color: var(--white);
+}
+
+.ttv-voice-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ttv-voice-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-black);
+}
+
+.ttv-voice-desc {
+  font-size: 12px;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.ttv-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(20, 20, 19, 0.08);
+  color: var(--charcoal);
+  flex-shrink: 0;
+}
+
+.ttv-badge.female { background: rgba(207, 69, 0, 0.12); color: var(--signal-orange); }
+.ttv-badge.male   { background: rgba(56, 96, 190, 0.12); color: var(--link-blue); }
+
+/* Textarea */
+.ttv-textarea {
+  min-height: 160px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.ttv-charcount {
+  font-size: 12px;
+  color: var(--charcoal);
+  text-align: right;
+}
+
+/* Speed slider */
+.ttv-slider {
+  width: 100%;
+  accent-color: var(--signal-orange);
+  cursor: pointer;
+}
+
+/* Submit button full-width */
+.ttv-submit {
+  width: 100%;
+  padding: 16px 28px;
+}
+
+/* Result */
+.ttv-result-header h3 {
+  font-size: 22px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ttv-audio {
+  width: 100%;
+}
+
+/* Spin (same as VoiceToText, needs local def) */
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .ttv-page .page-header h1 { font-size: 40px; }
+  .ttv-voice-grid { grid-template-columns: 1fr; }
+}

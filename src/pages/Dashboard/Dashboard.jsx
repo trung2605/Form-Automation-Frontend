@@ -1,7 +1,177 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { IconAutomation, IconDocument, IconDatabase, IconMessage, IconMic, IconTrending, IconSearch, IconClock, IconCheckCircle, IconArrow } from '../../components/Icons/CustomIcons';
+import { IconAutomation, IconDatabase, IconMessage, IconMic, IconTrending, IconSearch, IconClock, IconCheckCircle, IconArrow } from '../../components/Icons/CustomIcons';
 import './Dashboard.css';
+
+// Inline SVG previews — matches what's seeded in MongoDB
+const PREVIEW_IMAGES = {
+  form_automation: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#fdf8f3"/>
+    <rect x="24" y="20" width="260" height="180" rx="12" fill="white" stroke="#e8e0d8" stroke-width="1.5"/>
+    <rect x="40" y="36" width="120" height="10" rx="5" fill="#cf4500"/>
+    <rect x="40" y="56" width="228" height="8" rx="4" fill="#e8e0d8"/>
+    <rect x="40" y="72" width="180" height="8" rx="4" fill="#e8e0d8"/>
+    <rect x="40" y="96" width="228" height="28" rx="6" fill="#fdf8f3" stroke="#e8e0d8" stroke-width="1"/>
+    <rect x="48" y="104" width="80" height="8" rx="4" fill="#bdb2a7"/>
+    <rect x="40" y="134" width="228" height="28" rx="6" fill="#fdf8f3" stroke="#e8e0d8" stroke-width="1"/>
+    <rect x="48" y="142" width="120" height="8" rx="4" fill="#bdb2a7"/>
+    <rect x="40" y="172" width="80" height="20" rx="10" fill="#cf4500"/>
+    <rect x="48" y="178" width="64" height="8" rx="4" fill="white"/>
+    <circle cx="330" cy="60" r="44" fill="#fff7f2" stroke="#cf4500" stroke-width="1.5"/>
+    <path d="M316 60 l8 8 l16-16" stroke="#cf4500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="296" y="110" width="68" height="8" rx="4" fill="#e8e0d8"/>
+    <rect x="304" y="124" width="52" height="6" rx="3" fill="#e8e0d8"/>
+  </svg>`,
+
+  ai_form_generator: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#f5f8ff"/>
+    <rect x="24" y="20" width="160" height="180" rx="12" fill="white" stroke="#dde4f5" stroke-width="1.5"/>
+    <rect x="36" y="36" width="136" height="36" rx="8" fill="#f0f4ff" stroke="#3860be" stroke-width="1"/>
+    <rect x="44" y="44" width="100" height="8" rx="4" fill="#bdb2a7"/>
+    <rect x="44" y="56" width="72" height="6" rx="3" fill="#dde4f5"/>
+    <rect x="36" y="80" width="136" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="96" width="100" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="116" width="136" height="24" rx="6" fill="#3860be"/>
+    <rect x="44" y="122" width="80" height="8" rx="4" fill="white"/>
+    <rect x="36" y="148" width="136" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="164" width="80" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="204" y="20" width="172" height="180" rx="12" fill="white" stroke="#dde4f5" stroke-width="1.5"/>
+    <circle cx="290" cy="72" r="28" fill="#f0f4ff"/>
+    <path d="M278 72 q12-16 24 0 q-12 16-24 0" fill="#3860be" opacity="0.3"/>
+    <circle cx="290" cy="68" r="6" fill="#3860be"/>
+    <path d="M280 82 q10 8 20 0" stroke="#3860be" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <rect x="220" y="112" width="140" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="220" y="128" width="100" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="220" y="148" width="140" height="20" rx="6" fill="#3860be"/>
+    <rect x="228" y="154" width="80" height="8" rx="4" fill="white"/>
+    <path d="M196 80 l8-6 v12 l-8-6z" fill="#3860be"/>
+  </svg>`,
+
+  data_extractor: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#f3faf5"/>
+    <rect x="20" y="16" width="240" height="140" rx="10" fill="white" stroke="#c8e6d0" stroke-width="1.5"/>
+    <rect x="20" y="16" width="240" height="28" rx="10" fill="#e8f5ec"/>
+    <circle cx="36" cy="30" r="5" fill="#f87171"/>
+    <circle cx="52" cy="30" r="5" fill="#fbbf24"/>
+    <circle cx="68" cy="30" r="5" fill="#4ade80"/>
+    <rect x="88" y="24" width="120" height="12" rx="6" fill="#c8e6d0"/>
+    <rect x="32" y="56" width="216" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="32" y="72" width="160" height="8" rx="4" fill="#e8f5ec"/>
+    <rect x="32" y="88" width="200" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="32" y="104" width="140" height="8" rx="4" fill="#e8f5ec"/>
+    <rect x="32" y="120" width="180" height="8" rx="4" fill="#dde4f5"/>
+    <path d="M260 86 l16 0 l-8 12z" fill="#4ade80"/>
+    <rect x="280" y="56" width="100" height="100" rx="10" fill="white" stroke="#c8e6d0" stroke-width="1.5"/>
+    <rect x="288" y="68" width="84" height="10" rx="4" fill="#4ade80" opacity="0.4"/>
+    <rect x="288" y="86" width="84" height="8" rx="3" fill="#e8f5ec"/>
+    <rect x="288" y="100" width="60" height="8" rx="3" fill="#e8f5ec"/>
+    <rect x="288" y="114" width="84" height="8" rx="3" fill="#e8f5ec"/>
+    <rect x="288" y="128" width="72" height="8" rx="3" fill="#e8f5ec"/>
+    <rect x="100" y="168" width="200" height="36" rx="10" fill="white" stroke="#c8e6d0" stroke-width="1.5"/>
+    <rect x="116" y="180" width="60" height="8" rx="4" fill="#4ade80"/>
+    <rect x="184" y="180" width="100" height="8" rx="4" fill="#e8f5ec"/>
+  </svg>`,
+
+  social_media_bot: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#fdf5ff"/>
+    <circle cx="80" cy="80" r="44" fill="white" stroke="#e9d5ff" stroke-width="1.5"/>
+    <circle cx="80" cy="68" r="14" fill="#a855f7" opacity="0.3"/>
+    <path d="M58 96 q22-16 44 0" fill="#a855f7" opacity="0.2"/>
+    <circle cx="200" cy="52" r="44" fill="white" stroke="#e9d5ff" stroke-width="1.5"/>
+    <rect x="178" y="38" width="44" height="28" rx="6" fill="#a855f7" opacity="0.15"/>
+    <rect x="184" y="44" width="32" height="5" rx="2.5" fill="#a855f7" opacity="0.5"/>
+    <rect x="184" y="53" width="22" height="5" rx="2.5" fill="#a855f7" opacity="0.3"/>
+    <circle cx="320" cy="80" r="44" fill="white" stroke="#e9d5ff" stroke-width="1.5"/>
+    <circle cx="310" cy="72" r="8" fill="#a855f7" opacity="0.3"/>
+    <circle cx="330" cy="72" r="8" fill="#a855f7" opacity="0.3"/>
+    <path d="M308 86 q12 8 24 0" stroke="#a855f7" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M80 124 l60-28" stroke="#e9d5ff" stroke-width="2" stroke-dasharray="4 3"/>
+    <path d="M200 96 l60 8" stroke="#e9d5ff" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="80" y="148" width="240" height="52" rx="10" fill="white" stroke="#e9d5ff" stroke-width="1.5"/>
+    <rect x="96" y="160" width="60" height="8" rx="4" fill="#a855f7" opacity="0.4"/>
+    <rect x="96" y="174" width="180" height="6" rx="3" fill="#e9d5ff"/>
+    <circle cx="300" cy="167" r="12" fill="#a855f7"/>
+    <path d="M295 167 l4 4 l8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>`,
+
+  voice_to_text: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#fff8f5"/>
+    <rect x="24" y="24" width="160" height="172" rx="12" fill="white" stroke="#fdd9c8" stroke-width="1.5"/>
+    <circle cx="104" cy="72" r="24" fill="#fff0eb" stroke="#cf4500" stroke-width="1.5"/>
+    <rect x="98" y="56" width="12" height="24" rx="6" fill="#cf4500"/>
+    <path d="M90 76 q0 14 14 14 q14 0 14-14" stroke="#cf4500" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <line x1="104" y1="90" x2="104" y2="98" stroke="#cf4500" stroke-width="2"/>
+    <line x1="96" y1="98" x2="112" y2="98" stroke="#cf4500" stroke-width="2" stroke-linecap="round"/>
+    <rect x="36" y="112" width="136" height="8" rx="4" fill="#fdd9c8"/>
+    <rect x="36" y="128" width="100" height="8" rx="4" fill="#fdd9c8"/>
+    <rect x="36" y="148" width="136" height="28" rx="8" fill="#cf4500"/>
+    <rect x="52" y="158" width="88" height="8" rx="4" fill="white"/>
+    <path d="M204 86 l16 0 l-8 12z" fill="#cf4500"/>
+    <rect x="220" y="24" width="156" height="172" rx="12" fill="white" stroke="#fdd9c8" stroke-width="1.5"/>
+    <rect x="232" y="40" width="132" height="10" rx="4" fill="#fdd9c8"/>
+    <rect x="232" y="58" width="132" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="70" width="100" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="82" width="120" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="100" width="132" height="1" fill="#fdd9c8"/>
+    <rect x="232" y="108" width="80" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="120" width="132" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="132" width="100" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="148" width="132" height="1" fill="#fdd9c8"/>
+    <rect x="232" y="156" width="120" height="6" rx="3" fill="#fdd9c8"/>
+    <rect x="232" y="168" width="90" height="6" rx="3" fill="#fdd9c8"/>
+  </svg>`,
+
+  text_to_voice: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#f0f6ff"/>
+    <rect x="24" y="24" width="168" height="172" rx="12" fill="white" stroke="#c7d9f5" stroke-width="1.5"/>
+    <rect x="36" y="40" width="144" height="80" rx="8" fill="#f0f6ff"/>
+    <rect x="44" y="50" width="128" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="44" y="62" width="100" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="44" y="74" width="120" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="44" y="86" width="80" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="44" y="98" width="110" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="36" y="132" width="144" height="28" rx="8" fill="#3860be"/>
+    <rect x="52" y="142" width="88" height="8" rx="4" fill="white"/>
+    <rect x="36" y="168" width="144" height="16" rx="6" fill="#f0f6ff" stroke="#c7d9f5" stroke-width="1"/>
+    <circle cx="48" cy="176" r="4" fill="#3860be"/>
+    <rect x="58" y="173" width="60" height="6" rx="3" fill="#c7d9f5"/>
+    <path d="M212 86 l16 0 l-8 12z" fill="#3860be"/>
+    <rect x="228" y="24" width="148" height="172" rx="12" fill="white" stroke="#c7d9f5" stroke-width="1.5"/>
+    <circle cx="302" cy="72" r="28" fill="#f0f6ff"/>
+    <rect x="290" y="58" width="4" height="28" rx="2" fill="#3860be"/>
+    <rect x="298" y="52" width="4" height="40" rx="2" fill="#3860be" opacity="0.7"/>
+    <rect x="306" y="60" width="4" height="24" rx="2" fill="#3860be"/>
+    <rect x="314" y="56" width="4" height="32" rx="2" fill="#3860be" opacity="0.7"/>
+    <rect x="322" y="64" width="4" height="16" rx="2" fill="#3860be" opacity="0.4"/>
+    <rect x="240" y="112" width="124" height="8" rx="4" fill="#c7d9f5"/>
+    <rect x="240" y="128" width="80" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="240" y="148" width="124" height="20" rx="8" fill="#3860be"/>
+    <rect x="252" y="154" width="76" height="8" rx="4" fill="white"/>
+  </svg>`,
+
+  seo_keyword_analyzer: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#fffbf0"/>
+    <rect x="24" y="20" width="352" height="100" rx="12" fill="white" stroke="#fde68a" stroke-width="1.5"/>
+    <rect x="40" y="40" width="60" height="60" rx="8" fill="#fffbf0"/>
+    <path d="M56 82 l8-32 l8 20 l8-12 l8 24" stroke="#f59e0b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="116" y="44" width="120" height="8" rx="4" fill="#fde68a"/>
+    <rect x="116" y="60" width="80" height="6" rx="3" fill="#fde68a"/>
+    <rect x="116" y="74" width="100" height="6" rx="3" fill="#fde68a"/>
+    <rect x="260" y="36" width="100" height="28" rx="8" fill="#f59e0b"/>
+    <rect x="272" y="46" width="64" height="8" rx="4" fill="white"/>
+    <rect x="260" y="72" width="100" height="8" rx="4" fill="#fde68a"/>
+    <rect x="24" y="132" width="168" height="72" rx="12" fill="white" stroke="#fde68a" stroke-width="1.5"/>
+    <rect x="36" y="148" width="60" height="8" rx="4" fill="#fde68a"/>
+    <rect x="36" y="164" width="144" height="10" rx="4" fill="#fffbf0"/>
+    <rect x="36" y="164" width="100" height="10" rx="4" fill="#f59e0b" opacity="0.4"/>
+    <rect x="36" y="180" width="60" height="6" rx="3" fill="#fde68a"/>
+    <rect x="208" y="132" width="168" height="72" rx="12" fill="white" stroke="#fde68a" stroke-width="1.5"/>
+    <rect x="220" y="148" width="80" height="8" rx="4" fill="#fde68a"/>
+    <circle cx="314" cy="168" r="20" fill="#fffbf0" stroke="#f59e0b" stroke-width="1.5"/>
+    <path d="M307 168 q7-10 14 0 q-7 10-14 0" fill="#f59e0b" opacity="0.3"/>
+    <circle cx="314" cy="165" r="4" fill="#f59e0b"/>
+  </svg>`,
+};
 
 const mockTools = [
   {
@@ -11,16 +181,18 @@ const mockTools = [
     icon: <IconAutomation />,
     category: 'Tự động hóa',
     status: 'active',
-    route: '/tool/form-automation'
+    route: '/tool/form-automation',
+    previewKey: 'form_automation',
   },
   {
     id: 2,
-    title: 'Intelligent OCR',
-    description: 'Trích xuất dữ liệu tự động từ hình ảnh, hóa đơn và tài liệu giấy tờ bằng công nghệ OCR tiên tiến.',
-    icon: <IconDocument />,
-    category: 'Dữ liệu',
-    status: 'upcoming',
-    route: '#'
+    title: 'AI Form Generator',
+    description: 'Tạo Google Form tự động với phân nhánh thông minh chỉ bằng một câu lệnh văn bản tiếng Việt đơn giản.',
+    icon: <IconMessage />,
+    category: 'AI & Machine Learning',
+    status: 'active',
+    route: '/tool/ai-form-generator',
+    previewKey: 'ai_form_generator',
   },
   {
     id: 3,
@@ -29,7 +201,8 @@ const mockTools = [
     icon: <IconDatabase />,
     category: 'Dữ liệu',
     status: 'upcoming',
-    route: '#'
+    route: '#',
+    previewKey: 'data_extractor',
   },
   {
     id: 4,
@@ -38,7 +211,8 @@ const mockTools = [
     icon: <IconMessage />,
     category: 'Tự động hóa',
     status: 'upcoming',
-    route: '#'
+    route: '#',
+    previewKey: 'social_media_bot',
   },
   {
     id: 5,
@@ -46,8 +220,19 @@ const mockTools = [
     description: 'Chuyển đổi âm thanh cuộc họp, phỏng vấn thành văn bản có độ chính xác cao bằng mô hình Whisper.',
     icon: <IconMic />,
     category: 'AI & Machine Learning',
-    status: 'upcoming',
-    route: '#'
+    status: 'active',
+    route: '/tool/voice-to-text',
+    previewKey: 'voice_to_text',
+  },
+  {
+    id: 7,
+    title: 'Text to Voice AI',
+    description: 'Tổng hợp giọng nói tự nhiên tiếng Việt với nhiều nhân vật khác nhau bằng mô hình GPT-SoVITS.',
+    icon: <IconMic />,
+    category: 'AI & Machine Learning',
+    status: 'active',
+    route: '/tool/text-to-voice',
+    previewKey: 'text_to_voice',
   },
   {
     id: 6,
@@ -56,8 +241,9 @@ const mockTools = [
     icon: <IconTrending />,
     category: 'Marketing',
     status: 'upcoming',
-    route: '#'
-  }
+    route: '#',
+    previewKey: 'seo_keyword_analyzer',
+  },
 ];
 
 const categories = ['Tất cả', 'Tự động hóa', 'Dữ liệu', 'AI & Machine Learning', 'Marketing'];
@@ -78,49 +264,82 @@ export default function Dashboard() {
     card.style.setProperty('--mouse-y', `${y}px`);
   };
 
-  // Filter tools based on search query and category
   const filteredTools = mockTools.filter(tool => {
-    const matchesSearch = tool.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === 'Tất cả' || tool.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
-  // Sort tools
   const sortedTools = [...filteredTools].sort((a, b) => {
     if (sortBy === 'a-z') return a.title.localeCompare(b.title);
     if (sortBy === 'z-a') return b.title.localeCompare(a.title);
     if (sortBy === 'newest') return b.id - a.id;
-    return 0; // default
+    return 0;
   });
+
+  const CardContent = ({ tool }) => (
+    <>
+      {/* Preview image banner */}
+      {tool.previewKey && PREVIEW_IMAGES[tool.previewKey] && (
+        <div
+          className="tool-preview"
+          dangerouslySetInnerHTML={{ __html: PREVIEW_IMAGES[tool.previewKey] }}
+        />
+      )}
+      <div className="tool-card-body">
+        <div className="tool-icon">{tool.icon}</div>
+        <div className="tool-info">
+          <h3>{tool.title}</h3>
+          <p>{tool.description}</p>
+          <div className="tool-category-tag">{tool.category}</div>
+        </div>
+        <div className="tool-footer">
+          {tool.status === 'active' ? (
+            <>
+              <div className="tool-status status-active">
+                <IconCheckCircle /> Đang hoạt động
+              </div>
+              <div className="tool-action">
+                Sử dụng <IconArrow />
+              </div>
+            </>
+          ) : (
+            <div className="tool-status status-upcoming">
+              <IconClock /> Sắp ra mắt
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <div className="tools-directory animate-slide-up">
       <div className="dot-grid-bg"></div>
       <div className="aurora-bg"></div>
-      
+
       <div className="tools-header">
         <h1>Các Công Cụ</h1>
         <p>Khám phá bộ công cụ mạnh mẽ giúp tự động hóa quy trình làm việc và tối ưu hóa thời gian của bạn.</p>
       </div>
-      
-      {/* Search and Filters Section */}
+
       <div className="tools-controls">
         <div className="search-bar-wrapper">
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm công cụ..." 
+          <input
+            type="text"
+            placeholder="Tìm kiếm công cụ..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="tools-search-input"
           />
         </div>
-        
+
         <div className="filters-row">
           <div className="categories-filter">
             {categories.map(cat => (
-              <button 
-                key={cat} 
+              <button
+                key={cat}
                 className={`category-btn ${activeCategory === cat ? 'active' : ''}`}
                 onClick={() => setActiveCategory(cat)}
               >
@@ -131,8 +350,8 @@ export default function Dashboard() {
 
           <div className="sort-filter">
             <span className="sort-label">Sắp xếp:</span>
-            <select 
-              value={sortBy} 
+            <select
+              value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="sort-select"
             >
@@ -150,45 +369,21 @@ export default function Dashboard() {
           sortedTools.map((tool, idx) => (
             <div key={tool.id} className="tool-card-wrapper">
               {tool.status === 'active' ? (
-                <Link 
-                  to={tool.route} 
+                <Link
+                  to={tool.route}
                   className="tool-card"
                   ref={(el) => (cardsRef.current[idx] = el)}
                   onMouseMove={(e) => handleMouseMove(e, idx)}
                 >
-                  <div className="tool-icon">{tool.icon}</div>
-                  <div className="tool-info">
-                    <h3>{tool.title}</h3>
-                    <p>{tool.description}</p>
-                    <div className="tool-category-tag">{tool.category}</div>
-                  </div>
-                  <div className="tool-footer">
-                    <div className="tool-status status-active">
-                      <IconCheckCircle /> Đang hoạt động
-                    </div>
-                    <div className="tool-action">
-                      Sử dụng <IconArrow />
-                    </div>
-                  </div>
+                  <CardContent tool={tool} />
                 </Link>
               ) : (
-                <div 
-                  className="tool-card" 
-                  style={{ cursor: 'not-allowed', opacity: 0.7 }}
+                <div
+                  className="tool-card tool-card--disabled"
                   ref={(el) => (cardsRef.current[idx] = el)}
                   onMouseMove={(e) => handleMouseMove(e, idx)}
                 >
-                  <div className="tool-icon">{tool.icon}</div>
-                  <div className="tool-info">
-                    <h3>{tool.title}</h3>
-                    <p>{tool.description}</p>
-                    <div className="tool-category-tag">{tool.category}</div>
-                  </div>
-                  <div className="tool-footer">
-                    <div className="tool-status status-upcoming">
-                      <IconClock /> Sắp ra mắt
-                    </div>
-                  </div>
+                  <CardContent tool={tool} />
                 </div>
               )}
             </div>

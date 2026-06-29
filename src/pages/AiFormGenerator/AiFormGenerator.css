@@ -1,0 +1,268 @@
+/* AiFormGenerator.css - Mastercard Inspired Split Layout */
+
+.ai-form-page {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 80px 0 40px;
+}
+
+.page-header h1 {
+  font-size: 64px;
+  font-weight: 500;
+  letter-spacing: -1.28px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.page-header p {
+  font-size: 24px;
+  font-weight: 450;
+  color: var(--charcoal);
+  max-width: 600px;
+}
+
+.ai-content-split {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 900px; /* narrowed slightly so it doesn't look overly wide */
+  margin: 0 auto;
+}
+
+.template-card, .execution-card {
+  background: var(--white);
+  border-radius: 40px;
+  padding: 40px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.template-card h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.instruction-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--charcoal);
+  margin-bottom: 24px;
+}
+
+.code-block-wrapper {
+  background: var(--ink-black);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.btn-copy-sm {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-copy-sm:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.code-block {
+  margin: 0;
+  padding: 20px;
+  color: var(--lifted-cream);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.execution-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink-black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upload-wrapper {
+  display: inline-flex;
+}
+
+.btn-upload-sm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--lifted-cream);
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--ink-black);
+  transition: all 0.2s;
+}
+
+.btn-upload-sm:hover {
+  background: var(--dust-taupe);
+}
+
+.json-textarea {
+  min-height: 300px;
+  resize: vertical;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  background: #fdfdfd;
+  border-radius: 20px !important;
+  padding: 24px !important;
+}
+
+.btn-submit-form {
+  margin-top: 16px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 20px;
+  width: 100%;
+}
+
+/* Result Card Reuse */
+.result-card {
+  margin-top: 32px;
+  background: var(--white);
+  border-radius: 24px;
+  border: 1px solid rgba(20, 20, 19, 0.1);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  animation: slideUp 0.3s ease-out;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  background: rgba(39, 201, 63, 0.1);
+  border-bottom: 1px solid rgba(20, 20, 19, 0.05);
+}
+
+.result-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--ink-black);
+}
+
+.result-body {
+  display: flex;
+  padding: 24px;
+  gap: 24px;
+  align-items: center;
+}
+
+.qr-wrapper {
+  padding: 12px;
+  background: var(--white);
+  border: 1px solid rgba(20, 20, 19, 0.1);
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.link-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.form-link {
+  color: var(--link-blue);
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form-link:hover {
+  text-decoration: underline;
+}
+
+.btn-copy {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--lifted-cream);
+  border: 1px solid rgba(20, 20, 19, 0.1);
+  color: var(--ink-black);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-copy:hover {
+  background: var(--dust-taupe);
+}
+
+.result-footer {
+  padding: 16px 24px;
+  background: #fdfdfd;
+  border-top: 1px solid rgba(20, 20, 19, 0.05);
+  font-size: 13px;
+  color: var(--slate-gray);
+  line-height: 1.5;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

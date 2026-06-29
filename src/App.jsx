@@ -4,6 +4,9 @@ import MainLayout from './layout/MainLayout';
 import Home from './pages/Home/Home';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FormAutomationTool from './pages/FormAutomation/FormAutomationTool';
+import AiFormGenerator from './pages/AiFormGenerator/AiFormGenerator';
+import VoiceToText from './pages/VoiceToText/VoiceToText';
+import TextToVoice from './pages/TextToVoice/TextToVoice';
 import About from './pages/About/About';
 import Settings from './pages/Settings/Settings';
 import Login from './pages/Auth/Login';
@@ -24,6 +27,9 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route element={<PrivateRoute />}>
             <Route path="tool/form-automation" element={<FormAutomationTool />} />
+            <Route path="tool/ai-form-generator" element={<AiFormGenerator />} />
+            <Route path="tool/voice-to-text" element={<VoiceToText />} />
+            <Route path="tool/text-to-voice" element={<TextToVoice />} />
             <Route path="wallet" element={<Wallet />} />
             <Route path="settings" element={<Settings />} />
           </Route>

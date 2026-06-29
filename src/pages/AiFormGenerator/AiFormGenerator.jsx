@@ -1,77 +1,156 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import './AiFormGenerator.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axiosClient from '../../services/axiosClient';
 import { AuthContext } from '../../contexts/AuthContext';
-import { FiSend, FiLoader, FiCopy, FiCheckCircle } from 'react-icons/fi';
+import { FiUpload, FiLoader, FiCopy, FiCheckCircle, FiFileText } from 'react-icons/fi';
 import { QRCodeSVG } from 'qrcode.react';
+import { useGoogleLogin } from '@react-oauth/google';
+
+const JSON_TEMPLATE = `{
+  "title": "Tên biểu mẫu của bạn",
+  "description": "Mô tả biểu mẫu",
+  "items": [
+    {
+      "title": "Bạn là sinh viên hay người đi làm?",
+      "type": "RADIO",
+      "required": true,
+      "options": [
+        { "value": "Sinh viên", "goto_section": "sec_sinhvien" },
+        { "value": "Người đi làm", "goto_action": "SUBMIT_FORM" }
+      ]
+    },
+    {
+      "section_id": "sec_sinhvien",
+      "type": "SECTION",
+      "title": "Dành cho Sinh Viên"
+    },
+    {
+      "title": "Bạn học chuyên ngành gì?",
+      "type": "TEXT",
+      "required": false
+    }
+  ]
+}`;
+
+const PROMPT_TEMPLATE = `Bạn là một chuyên gia tạo Google Form. Dựa vào yêu cầu sau: "[CHÈN YÊU CẦU CỦA BẠN VÀO ĐÂY]", hãy tạo một cấu trúc Form chi tiết dưới dạng JSON.
+
+QUY TẮC BẮT BUỘC:
+1. Trường "type" CHỈ ĐƯỢC PHÉP sử dụng 1 trong 6 từ khóa chính xác sau (TUYỆT ĐỐI KHÔNG TỰ BỊA RA LOẠI KHÁC):
+   - "TEXT": Câu trả lời ngắn
+   - "PARAGRAPH_TEXT": Câu trả lời dài (đoạn văn)
+   - "RADIO": Trắc nghiệm chọn 1 đáp án
+   - "CHECKBOX": Trắc nghiệm chọn nhiều đáp án
+   - "DROP_DOWN": Menu thả xuống
+   - "SECTION": Tạo Phần mới (Chuyển trang)
+
+2. ĐIỀU HƯỚNG TRANG (Rẽ nhánh):
+   - Chỉ dùng cho câu hỏi loại "RADIO" hoặc "DROP_DOWN".
+   - Mảng "options" chứa các object. Dùng "goto_section": "<id>" để rẽ sang trang khác, hoặc "goto_action": "SUBMIT_FORM" để nộp form.
+   - Các phần (SECTION) phải có "section_id" tương ứng để câu hỏi có thể trỏ tới.
+   - Câu hỏi thông thường (TEXT, CHECKBOX) thì "options" chỉ chứa "value" (nếu có).
+
+Cấu trúc JSON mẫu:
+\${JSON_TEMPLATE}
+
+Chỉ trả về chuỗi JSON thuần túy, không bọc trong thẻ markdown (\`\`\`json) và không giải thích gì thêm.`;
 
 function AiFormGenerator() {
   const { user, refreshWallet } = React.useContext(AuthContext);
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Chào bạn! Mình là AI Form Generator. Bạn muốn tạo một biểu mẫu Google Form về chủ đề gì? Hãy mô tả chi tiết nhé (bao gồm cả các câu hỏi muốn hỏi, và điều kiện rẽ nhánh nếu có). Phí tạo mỗi form là 5 Credits.' }
-  ]);
-  const [input, setInput] = useState('');
-  const [email, setEmail] = useState('');
+  const [jsonInput, setJsonInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [result, setResult] = useState(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target.result;
+        // Validate JSON immediately
+        JSON.parse(content);
+        setJsonInput(content);
+        toast.success("Đã tải file JSON thành công!");
+      } catch (error) {
+        toast.error("File không chứa JSON hợp lệ.");
+      }
+    };
+    reader.readAsText(file);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const loginAndCreateForm = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      let parsedJson;
+      try {
+        parsedJson = JSON.parse(jsonInput);
+      } catch (error) {
+        toast.error("Cú pháp JSON không hợp lệ. Vui lòng kiểm tra lại.");
+        return;
+      }
 
-  const handleSend = async (e) => {
+      setLoading(true);
+      setResult(null);
+
+      try {
+        const response = await axiosClient.post('/ai-tools/generate-form', {
+          json_data: parsedJson,
+          access_token: tokenResponse.access_token
+        });
+
+        const { formUrl, formTitle, message } = response.data;
+        
+        setResult({
+          url: formUrl,
+          title: formTitle || parsedJson.title || "Untitled Form",
+          message: message
+        });
+        
+        toast.success("Tạo Form thành công!");
+        refreshWallet();
+      } catch (error) {
+        if (error.response?.status === 402) {
+          toast.error("Số dư ví không đủ. Vui lòng nạp thêm Credits!");
+        } else {
+          toast.error("Lỗi: " + (error.response?.data?.error || error.message));
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      toast.error("Đăng nhập Google thất bại!");
+    },
+    scope: 'https://www.googleapis.com/auth/forms.body https://www.googleapis.com/auth/drive'
+  });
+
+  const handleCreateFormClick = (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
-    if (!email.trim() || !email.includes('@')) {
-      toast.warn("Vui lòng nhập Email hợp lệ để nhận quyền sở hữu Form!");
+    if (!jsonInput.trim()) {
+      toast.warn("Vui lòng dán nội dung JSON hoặc tải file lên!");
+      return;
+    }
+    
+    try {
+      JSON.parse(jsonInput);
+    } catch (error) {
+      toast.error("Cú pháp JSON không hợp lệ. Vui lòng kiểm tra lại.");
       return;
     }
 
-    const userMessage = input.trim();
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-    setLoading(true);
-
-    try {
-      const response = await axiosClient.post('/ai-tools/generate-form', {
-        prompt: userMessage,
-        email: email.trim()
-      });
-
-      const { formUrl, formTitle, message } = response.data;
-      
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: message || "Tuyệt vời! Form của bạn đã được tạo thành công.",
-        result: {
-          url: formUrl,
-          title: formTitle || "Untitled Form"
-        }
-      }]);
-      toast.success("Tạo Form thành công!");
-      refreshWallet();
-    } catch (error) {
-      if (error.response?.status === 402) {
-        toast.error("Số dư ví không đủ. Vui lòng nạp thêm Credits!");
-        setMessages(prev => [...prev, { role: 'assistant', content: "Xin lỗi, số dư của bạn không đủ để tạo form (cần 5 credits)." }]);
-      } else {
-        toast.error("Lỗi: " + (error.response?.data?.error || error.message));
-        setMessages(prev => [...prev, { role: 'assistant', content: "Đã có lỗi xảy ra trong quá trình tạo form. Vui lòng thử lại sau." }]);
-      }
-    } finally {
-      setLoading(false);
-    }
+    // Trigger Google Login
+    loginAndCreateForm();
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text, type) => {
     navigator.clipboard.writeText(text);
-    toast.success("Đã copy link!");
+    if (type === 'prompt') {
+      toast.success("Đã copy Prompt Template!");
+    } else {
+      toast.success("Đã copy link Form!");
+    }
   };
 
   return (
@@ -79,91 +158,93 @@ function AiFormGenerator() {
       <ToastContainer position="bottom-right" theme="colored" />
       
       <header className="page-header">
-        <h1>AI FORM GENERATOR</h1>
-        <p>Tạo Google Form tự động bằng Trí tuệ nhân tạo</p>
+        <h1>FORM GENERATOR</h1>
+        <p>Tạo Google Form tự động từ cấu trúc JSON</p>
       </header>
 
-      <main className="ai-content">
-        <div className="chat-container glass-panel">
+      <main className="ai-content-split">
+        {/* Left Column: Instructions & Template */}
+        <div className="template-card glass-panel">
+          <h2>Hướng dẫn sử dụng</h2>
+          <p className="instruction-text">
+            Sử dụng AI của riêng bạn (ChatGPT, Claude, Gemini) để sinh cấu trúc Form. Hãy copy Prompt mẫu dưới đây và dán vào AI của bạn:
+          </p>
           
-          <div className="email-config-bar">
-            <label htmlFor="ownerEmail">Email nhận quyền Editor Form:</label>
-            <input 
-              id="ownerEmail"
-              type="email" 
-              placeholder="VD: tranvan.a@gmail.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-mc"
-              required
-            />
+          <div className="code-block-wrapper">
+            <div className="code-block-header">
+              <span>Prompt Template</span>
+              <button className="btn-copy-sm" onClick={() => copyToClipboard(PROMPT_TEMPLATE, 'prompt')}>
+                <FiCopy /> Copy
+              </button>
+            </div>
+            <pre className="code-block">
+              <code>{PROMPT_TEMPLATE}</code>
+            </pre>
           </div>
+          
+          <p className="instruction-text" style={{marginTop: '24px'}}>
+            <b>Lưu ý:</b> Hệ thống hỗ trợ các loại câu hỏi: <code>RADIO</code>, <code>CHECKBOX</code>, <code>DROP_DOWN</code>, <code>TEXT</code>, <code>PARAGRAPH_TEXT</code>.
+          </p>
+        </div>
 
-          <div className="chat-history">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`chat-message ${msg.role}`}>
-                <div className="chat-bubble">
-                  <div className="chat-text">{msg.content}</div>
-                  
-                  {msg.result && (
-                    <div className="result-card">
-                      <div className="result-header">
-                        <FiCheckCircle color="#27c93f" size={20} />
-                        <h3>{msg.result.title}</h3>
-                      </div>
-                      <div className="result-body">
-                        <div className="qr-wrapper">
-                          <QRCodeSVG value={msg.result.url} size={100} />
-                        </div>
-                        <div className="link-wrapper">
-                          <a href={msg.result.url} target="_blank" rel="noreferrer" className="form-link">
-                            {msg.result.url}
-                          </a>
-                          <button className="btn-copy" onClick={() => copyToClipboard(msg.result.url)}>
-                            <FiCopy /> Copy Link
-                          </button>
-                        </div>
-                      </div>
-                      <div className="result-footer">
-                        Form đã được chia sẻ quyền Editor cho email: <b>{email}</b>. Vui lòng kiểm tra email hoặc Google Drive.
-                      </div>
-                    </div>
-                  )}
+        {/* Right Column: Execution */}
+        <div className="execution-card glass-panel">
+          <form className="execution-form">
+            
+            <div className="form-group">
+              <label>
+                Cấu trúc JSON Form
+                <div className="upload-wrapper">
+                  <input 
+                    type="file" 
+                    id="jsonUpload" 
+                    accept=".json" 
+                    onChange={handleFileUpload} 
+                    style={{display: 'none'}} 
+                  />
+                  <label htmlFor="jsonUpload" className="btn-upload-sm">
+                    <FiUpload /> Upload .json
+                  </label>
                 </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="chat-message assistant">
-                <div className="chat-bubble loading-bubble">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+              </label>
+              <textarea
+                className="input-mc json-textarea"
+                placeholder="Dán JSON vào đây..."
+                value={jsonInput}
+                onChange={(e) => setJsonInput(e.target.value)}
+                required
+              />
+            </div>
 
-          <form className="chat-input-area" onSubmit={handleSend}>
-            <textarea
-              className="chat-input input-mc"
-              placeholder="Nhập yêu cầu tạo Form của bạn..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend(e);
-                }
-              }}
-              disabled={loading}
-              rows={2}
-            />
-            <button type="submit" className="btn-ink btn-send" disabled={loading || !input.trim()}>
-              {loading ? <FiLoader className="spin" /> : <FiSend />}
+            <button type="button" onClick={handleCreateFormClick} className="btn-ink btn-submit-form" disabled={loading}>
+              {loading ? <><FiLoader className="spin" /> Đang xử lý...</> : "Đăng nhập Google & Tạo Form (5 Credits)"}
             </button>
           </form>
 
+          {result && (
+            <div className="result-card">
+              <div className="result-header">
+                <FiCheckCircle color="#27c93f" size={20} />
+                <h3>{result.title}</h3>
+              </div>
+              <div className="result-body">
+                <div className="qr-wrapper">
+                  <QRCodeSVG value={result.url} size={100} />
+                </div>
+                <div className="link-wrapper">
+                  <a href={result.url} target="_blank" rel="noreferrer" className="form-link">
+                    {result.url}
+                  </a>
+                  <button className="btn-copy" onClick={() => copyToClipboard(result.url, 'link')}>
+                    <FiCopy /> Copy Link
+                  </button>
+                </div>
+              </div>
+              <div className="result-footer">
+                {result.message}
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

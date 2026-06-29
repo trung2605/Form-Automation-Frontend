@@ -1,0 +1,154 @@
+/* VoiceToText.css */
+
+.vtt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 80px 0 40px;
+}
+
+.vtt-page .page-header h1 {
+  font-size: 64px;
+  font-weight: 500;
+  letter-spacing: -1.28px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.vtt-page .page-header p {
+  font-size: 24px;
+  font-weight: 450;
+  color: var(--charcoal);
+  max-width: 640px;
+}
+
+.vtt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* Cards — use glass-panel from index.css for box-shadow/radius, add layout only */
+.vtt-card,
+.vtt-result {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Dropzone */
+.vtt-dropzone {
+  border: 2px dashed rgba(20, 20, 19, 0.2);
+  border-radius: 24px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--charcoal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.vtt-dropzone:hover {
+  border-color: var(--light-signal-orange);
+  background: rgba(243, 115, 56, 0.04);
+}
+
+.vtt-dropzone.has-file {
+  border-color: var(--signal-orange);
+  background: rgba(207, 69, 0, 0.05);
+}
+
+.vtt-drop-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink-black);
+}
+
+.vtt-drop-sub {
+  font-size: 14px;
+  color: var(--charcoal);
+}
+
+.vtt-filename {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--signal-orange);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Options row */
+.vtt-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.vtt-options .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vtt-options label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--charcoal);
+}
+
+/* btn-ink / btn-outline / input-mc come from index.css — no override here */
+
+/* Submit button full-width */
+.vtt-submit {
+  width: 100%;
+  padding: 16px 28px;
+}
+
+/* Result */
+.vtt-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.vtt-result-header h3 {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.vtt-meta {
+  font-size: 13px;
+  color: var(--charcoal);
+  font-family: monospace;
+}
+
+.vtt-output {
+  min-height: 220px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.vtt-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Spin animation (local — not in global CSS) */
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .vtt-page .page-header h1 { font-size: 40px; }
+  .vtt-options { grid-template-columns: 1fr; }
+}
