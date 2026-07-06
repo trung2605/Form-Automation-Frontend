@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IconAutomation, IconDatabase, IconMessage, IconMic, IconTrending, IconSearch, IconClock, IconCheckCircle, IconArrow } from '../../components/Icons/CustomIcons';
+import { FiUsers } from 'react-icons/fi';
 import './Dashboard.css';
 
 // Inline SVG previews — matches what's seeded in MongoDB
@@ -171,6 +172,28 @@ const PREVIEW_IMAGES = {
     <path d="M307 168 q7-10 14 0 q-7 10-14 0" fill="#f59e0b" opacity="0.3"/>
     <circle cx="314" cy="165" r="4" fill="#f59e0b"/>
   </svg>`,
+
+  group_expense_splitter: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#f0fdf7"/>
+    <circle cx="100" cy="60" r="26" fill="white" stroke="#a7f3d0" stroke-width="1.5"/>
+    <circle cx="100" cy="52" r="9" fill="#10b981" opacity="0.4"/>
+    <path d="M84 74 q16-14 32 0" fill="#10b981" opacity="0.25"/>
+    <circle cx="200" cy="40" r="26" fill="white" stroke="#a7f3d0" stroke-width="1.5"/>
+    <circle cx="200" cy="32" r="9" fill="#10b981" opacity="0.4"/>
+    <path d="M184 54 q16-14 32 0" fill="#10b981" opacity="0.25"/>
+    <circle cx="300" cy="60" r="26" fill="white" stroke="#a7f3d0" stroke-width="1.5"/>
+    <circle cx="300" cy="52" r="9" fill="#10b981" opacity="0.4"/>
+    <path d="M284 74 q16-14 32 0" fill="#10b981" opacity="0.25"/>
+    <path d="M120 68 l60-20" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="4 3"/>
+    <path d="M220 42 l60 12" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="60" y="110" width="280" height="90" rx="12" fill="white" stroke="#a7f3d0" stroke-width="1.5"/>
+    <rect x="76" y="126" width="90" height="10" rx="5" fill="#10b981"/>
+    <rect x="76" y="144" width="140" height="7" rx="3.5" fill="#d1fae5"/>
+    <rect x="76" y="158" width="100" height="7" rx="3.5" fill="#d1fae5"/>
+    <path d="M250 150 l14 14 l30-30" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="76" y="176" width="60" height="16" rx="8" fill="#10b981"/>
+    <rect x="84" y="180" width="44" height="8" rx="4" fill="white"/>
+  </svg>`,
 };
 
 const mockTools = [
@@ -244,9 +267,19 @@ const mockTools = [
     route: '#',
     previewKey: 'seo_keyword_analyzer',
   },
+  {
+    id: 8,
+    title: 'Chia tiền nhóm',
+    description: 'Tạo nhóm chia tiền chuyến đi, mỗi người gửi số tiền đã chi, tự động tính ai cần trả ai bao nhiêu.',
+    icon: <FiUsers />,
+    category: 'Tiện ích',
+    status: 'active',
+    route: '/split-create',
+    previewKey: 'group_expense_splitter',
+  },
 ];
 
-const categories = ['Tất cả', 'Tự động hóa', 'Dữ liệu', 'AI & Machine Learning', 'Marketing'];
+const categories = ['Tất cả', 'Tự động hóa', 'Dữ liệu', 'AI & Machine Learning', 'Marketing', 'Tiện ích'];
 
 export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');

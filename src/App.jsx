@@ -7,6 +7,8 @@ import FormAutomationTool from './pages/FormAutomation/FormAutomationTool';
 import AiFormGenerator from './pages/AiFormGenerator/AiFormGenerator';
 import VoiceToText from './pages/VoiceToText/VoiceToText';
 import TextToVoice from './pages/TextToVoice/TextToVoice';
+import CreateSplitGroup from './pages/GroupSplit/CreateSplitGroup';
+import SplitGroupPage from './pages/GroupSplit/SplitGroupPage';
 import About from './pages/About/About';
 import Settings from './pages/Settings/Settings';
 import Login from './pages/Auth/Login';
@@ -30,6 +32,7 @@ function App() {
             <Route path="tool/ai-form-generator" element={<AiFormGenerator />} />
             <Route path="tool/voice-to-text" element={<VoiceToText />} />
             <Route path="tool/text-to-voice" element={<TextToVoice />} />
+            <Route path="split-create" element={<CreateSplitGroup />} />
             <Route path="wallet" element={<Wallet />} />
             <Route path="settings" element={<Settings />} />
           </Route>
@@ -37,6 +40,7 @@ function App() {
             <Route path="admin" element={<AdminDashboard />} />
           </Route>
           <Route path="about" element={<About />} />
+          <Route path="split/:code" element={<SplitGroupPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
