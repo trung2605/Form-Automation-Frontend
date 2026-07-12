@@ -280,6 +280,187 @@
   color: var(--charcoal);
 }
 
+.gsp-member-amount.positive { color: #10b981; }
+.gsp-member-amount.negative { color: #ef4444; }
+
+/* Password gate */
+.gsp-gate-card {
+  max-width: 380px;
+  width: 100%;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.gsp-gate-card h3 {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.gsp-error-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #ef4444;
+  margin: 0;
+}
+
+/* Password reveal (create page) */
+.gsp-password-reveal {
+  gap: 6px;
+}
+
+.gsp-password-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1.5px dashed #10b981;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 4px;
+}
+
+.gsp-password-text {
+  font-family: 'Courier New', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #10b981;
+  flex: 1;
+}
+
+/* Join card */
+.gsp-join-card {
+  border: 1.5px solid #10b981;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.gsp-join-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gsp-join-row .gsp-input { flex: 1; }
+
+.gsp-join-btn {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Field header (label + inline action) */
+.gsp-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.gsp-field-header .gsp-label { margin-top: 0; }
+
+.gsp-select-all {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Participant chips */
+.gsp-participant-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gsp-chip {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--dust-taupe);
+  background: var(--white);
+  color: var(--charcoal);
+  font-size: 13px;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.gsp-chip.active {
+  border-color: #10b981;
+  background: #10b981;
+  color: var(--white);
+}
+
+/* Expense list */
+.gsp-expense-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.gsp-expense-row {
+  border: 1px solid var(--dust-taupe);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: var(--canvas-cream);
+}
+
+.gsp-expense-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.gsp-expense-desc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--ink-black);
+}
+
+.gsp-expense-amount {
+  font-weight: 700;
+  color: #10b981;
+}
+
+.gsp-expense-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--slate-gray);
+}
+
+.gsp-expense-del {
+  background: none;
+  border: none;
+  color: var(--slate-gray);
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.gsp-expense-del:hover { color: #ef4444; }
+
+.gsp-add-expense {
+  border-top: 1px solid var(--dust-taupe);
+  padding-top: 16px;
+  margin-top: 8px;
+}
+
 .gsp-my-entry {
   display: flex;
   justify-content: space-between;

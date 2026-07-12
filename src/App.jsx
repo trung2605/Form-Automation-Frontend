@@ -9,6 +9,8 @@ import VoiceToText from './pages/VoiceToText/VoiceToText';
 import TextToVoice from './pages/TextToVoice/TextToVoice';
 import CreateSplitGroup from './pages/GroupSplit/CreateSplitGroup';
 import SplitGroupPage from './pages/GroupSplit/SplitGroupPage';
+import SeoAnalyzer from './pages/SeoAnalyzer/SeoAnalyzer';
+import Summarizer from './pages/Summarizer/Summarizer';
 import About from './pages/About/About';
 import Settings from './pages/Settings/Settings';
 import Login from './pages/Auth/Login';
@@ -33,6 +35,8 @@ function App() {
             <Route path="tool/voice-to-text" element={<VoiceToText />} />
             <Route path="tool/text-to-voice" element={<TextToVoice />} />
             <Route path="split-create" element={<CreateSplitGroup />} />
+            <Route path="tool/seo-analyzer" element={<SeoAnalyzer />} />
+            <Route path="tool/summarizer" element={<Summarizer />} />
             <Route path="wallet" element={<Wallet />} />
             <Route path="settings" element={<Settings />} />
           </Route>

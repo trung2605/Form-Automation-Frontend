@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IconAutomation, IconDatabase, IconMessage, IconMic, IconTrending, IconSearch, IconClock, IconCheckCircle, IconArrow } from '../../components/Icons/CustomIcons';
-import { FiUsers } from 'react-icons/fi';
+import { FiUsers, FiFileText } from 'react-icons/fi';
 import './Dashboard.css';
 
 // Inline SVG previews — matches what's seeded in MongoDB
@@ -194,6 +194,31 @@ const PREVIEW_IMAGES = {
     <rect x="76" y="176" width="60" height="16" rx="8" fill="#10b981"/>
     <rect x="84" y="180" width="44" height="8" rx="4" fill="white"/>
   </svg>`,
+
+  text_summarizer: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#f5f8ff"/>
+    <rect x="24" y="20" width="168" height="180" rx="12" fill="white" stroke="#dde4f5" stroke-width="1.5"/>
+    <rect x="36" y="36" width="144" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="52" width="144" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="68" width="100" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="92" width="144" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="108" width="144" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="124" width="120" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="148" width="144" height="8" rx="4" fill="#dde4f5"/>
+    <rect x="36" y="164" width="90" height="8" rx="4" fill="#dde4f5"/>
+    <path d="M204 86 l16 0 l-8 12z" fill="#3860be"/>
+    <rect x="228" y="20" width="148" height="180" rx="12" fill="white" stroke="#c7d9f5" stroke-width="1.5"/>
+    <circle cx="252" cy="44" r="5" fill="#3860be"/>
+    <rect x="264" y="40" width="96" height="8" rx="4" fill="#3860be" opacity="0.5"/>
+    <circle cx="252" cy="68" r="5" fill="#3860be"/>
+    <rect x="264" y="64" width="80" height="8" rx="4" fill="#3860be" opacity="0.3"/>
+    <circle cx="252" cy="92" r="5" fill="#3860be"/>
+    <rect x="264" y="88" width="88" height="8" rx="4" fill="#3860be" opacity="0.3"/>
+    <rect x="240" y="128" width="124" height="52" rx="8" fill="#f0f6ff"/>
+    <rect x="252" y="140" width="100" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="252" y="152" width="80" height="6" rx="3" fill="#c7d9f5"/>
+    <rect x="252" y="164" width="60" height="6" rx="3" fill="#c7d9f5"/>
+  </svg>`,
 };
 
 const mockTools = [
@@ -260,12 +285,22 @@ const mockTools = [
   {
     id: 6,
     title: 'SEO Keyword Analyzer',
-    description: 'Phân tích mật độ từ khóa, tối ưu hóa on-page SEO và theo dõi thứ hạng trên công cụ tìm kiếm.',
+    description: 'Phân tích mật độ từ khóa, tối ưu hóa on-page SEO từ văn bản hoặc URL bài viết.',
     icon: <IconTrending />,
     category: 'Marketing',
-    status: 'upcoming',
-    route: '#',
+    status: 'active',
+    route: '/tool/seo-analyzer',
     previewKey: 'seo_keyword_analyzer',
+  },
+  {
+    id: 9,
+    title: 'Text Summarizer',
+    description: 'Tóm tắt bài viết, báo cáo dài thành nội dung cốt lõi kèm điểm chính bằng AI.',
+    icon: <FiFileText />,
+    category: 'AI & Machine Learning',
+    status: 'active',
+    route: '/tool/summarizer',
+    previewKey: 'text_summarizer',
   },
   {
     id: 8,

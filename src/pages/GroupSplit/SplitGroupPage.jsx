@@ -4,8 +4,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axiosClient from '../../services/axiosClient';
 import {
-  FiUsers, FiCopy, FiLoader, FiLock, FiEdit2, FiCheck,
-  FiArrowRight, FiAlertCircle, FiTrendingUp, FiTrendingDown,
+  FiUsers, FiCopy, FiLoader, FiLock, FiPlus, FiTrash2, FiCheck,
+  FiArrowRight, FiAlertCircle, FiTrendingUp, FiTrendingDown, FiTag, FiKey,
 } from 'react-icons/fi';
 import './GroupSplit.css';
 
@@ -14,103 +14,205 @@ const fmt = (n) => new Intl.NumberFormat('vi-VN').format(Math.round(n || 0)) + '
 
 function SplitGroupPage() {
   const { code } = useParams();
-  const storageKey = `split_${code}`;
+  const identityKey = `split_identity_${code}`; // { member_id, name_password }
+
+  const [groupPassword, setGroupPassword] = useState('');
+  const [gateError, setGateError] = useState('');
+  const [gateSubmitting, setGateSubmitting] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
   const [group, setGroup] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const [memberId, setMemberId] = useState(() => localStorage.getItem(storageKey) || null);
 
-  const [name, setName] = useState('');
-  const [amount, setAmount] = useState('');
-  const [weight, setWeight] = useState('1');
-  const [useWeight, setUseWeight] = useState(false);
+  const [identity, setIdentity] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(identityKey)) || null; }
+    catch { return null; }
+  });
+
+  const [joinName, setJoinName] = useState('');
+  const [joinPassword, setJoinPassword] = useState('');
+  const [joining, setJoining] = useState(false);
+
+  const [claimingName, setClaimingName] = useState(null); // name string currently being claimed
+  const [claimPassword, setClaimPassword] = useState('');
+  const [claiming, setClaiming] = useState(false);
+
+  const [expDesc, setExpDesc] = useState('');
+  const [expAmount, setExpAmount] = useState('');
+  const [expPaidBy, setExpPaidBy] = useState('');
+  const [expPayerPassword, setExpPayerPassword] = useState('');
+  const [expParticipants, setExpParticipants] = useState([]);
+  const [addingExpense, setAddingExpense] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   const pollRef = useRef(null);
 
-  const fetchGroup = useCallback(async () => {
+  const fetchGroup = useCallback(async (pw) => {
     try {
-      const res = await axiosClient.get(`/split/groups/${code}`);
+      const res = await axiosClient.get(`/split/groups/${code}`, { params: { group_password: pw } });
       setGroup(res.data);
       setNotFound(false);
+      return true;
     } catch (error) {
       if (error.response?.status === 404) setNotFound(true);
-    } finally {
-      setLoading(false);
+      if (error.response?.status === 403) return false;
+      return true; // transient error, don't lock user out
     }
   }, [code]);
 
-  useEffect(() => {
-    fetchGroup();
-    pollRef.current = setInterval(fetchGroup, POLL_MS);
-    return () => clearInterval(pollRef.current);
-  }, [fetchGroup]);
-
-  const myMember = group?.members?.find(m => m.member_id === memberId) || null;
-
-  const handleSubmit = async () => {
-    if (!name.trim()) { toast.warn('Vui lòng nhập tên.'); return; }
-    const amt = parseFloat(amount);
-    if (isNaN(amt) || amt < 0) { toast.warn('Số tiền không hợp lệ.'); return; }
-
-    setSubmitting(true);
-    try {
-      const body = { name: name.trim(), amount_spent: amt };
-      if (useWeight) body.weight = parseFloat(weight) || 1;
-      const res = await axiosClient.post(`/split/groups/${code}/members`, body);
-      const { member_id, ...groupData } = res.data;
-      localStorage.setItem(storageKey, member_id);
-      setMemberId(member_id);
-      setGroup(groupData);
-      toast.success('Đã gửi chi tiêu của bạn!');
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Không thể gửi. Vui lòng thử lại.');
-    } finally {
-      setSubmitting(false);
+  const handleGateSubmit = async () => {
+    if (!groupPassword.trim()) { setGateError('Vui lòng nhập mật khẩu nhóm.'); return; }
+    setGateSubmitting(true);
+    setGateError('');
+    const ok = await fetchGroup(groupPassword.trim());
+    setGateSubmitting(false);
+    if (ok) {
+      setUnlocked(true);
+    } else {
+      setGateError('Sai mật khẩu nhóm hoặc nhóm không tồn tại.');
     }
   };
 
-  const handleUpdate = async () => {
-    const amt = parseFloat(amount);
-    if (isNaN(amt) || amt < 0) { toast.warn('Số tiền không hợp lệ.'); return; }
+  useEffect(() => {
+    if (!unlocked) return;
+    pollRef.current = setInterval(() => fetchGroup(groupPassword), POLL_MS);
+    return () => clearInterval(pollRef.current);
+  }, [unlocked, groupPassword, fetchGroup]);
 
-    setSubmitting(true);
+  useEffect(() => {
+    if (group && group.members.length && !expPaidBy) {
+      setExpPaidBy(identity?.member_id || group.members[0].member_id);
+    }
+  }, [group, identity, expPaidBy]);
+
+  const myMember = group?.members?.find(m => m.member_id === identity?.member_id) || null;
+
+  const handleJoin = async () => {
+    if (!joinName.trim()) { toast.warn('Vui lòng nhập tên.'); return; }
+    if (joinPassword.trim().length < 4) { toast.warn('Mật khẩu tên phải có ít nhất 4 ký tự.'); return; }
+
+    setJoining(true);
     try {
-      const body = { name: name.trim() || myMember.name, amount_spent: amt };
-      if (useWeight) body.weight = parseFloat(weight) || 1;
-      const res = await axiosClient.patch(`/split/groups/${code}/members/${memberId}`, body);
-      setGroup(res.data);
-      setEditing(false);
-      toast.success('Đã cập nhật!');
+      const res = await axiosClient.post(`/split/groups/${code}/members`, {
+        group_password: groupPassword, name: joinName.trim(), name_password: joinPassword,
+      });
+      const { member_id, ...groupData } = res.data;
+      const newIdentity = { member_id, name_password: joinPassword };
+      localStorage.setItem(identityKey, JSON.stringify(newIdentity));
+      setIdentity(newIdentity);
+      setGroup(groupData);
+      toast.success('Đã tham gia nhóm!');
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Không thể cập nhật.');
+      if (error.response?.status === 409 && error.response.data?.name_exists) {
+        setClaimingName(joinName.trim());
+      } else {
+        toast.error(error.response?.data?.error || 'Không thể tham gia.');
+      }
     } finally {
-      setSubmitting(false);
+      setJoining(false);
+    }
+  };
+
+  const handleClaim = async () => {
+    const existing = group.members.find(m => m.name.trim().toLowerCase() === claimingName.toLowerCase());
+    if (!existing) return;
+    if (!claimPassword.trim()) { toast.warn('Vui lòng nhập mật khẩu.'); return; }
+
+    setClaiming(true);
+    try {
+      const res = await axiosClient.post(`/split/groups/${code}/members/${existing.member_id}/verify`, {
+        group_password: groupPassword, name_password: claimPassword,
+      });
+      const newIdentity = { member_id: res.data.member_id, name_password: claimPassword };
+      localStorage.setItem(identityKey, JSON.stringify(newIdentity));
+      setIdentity(newIdentity);
+      setClaimingName(null);
+      setClaimPassword('');
+      toast.success('Xác nhận thành công!');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Sai mật khẩu.');
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  const toggleParticipant = (mid) => {
+    setExpParticipants(prev =>
+      prev.includes(mid) ? prev.filter(x => x !== mid) : [...prev, mid]
+    );
+  };
+
+  const selectAllParticipants = () => {
+    setExpParticipants(group.members.map(m => m.member_id));
+  };
+
+  const resetExpenseForm = () => {
+    setExpDesc('');
+    setExpAmount('');
+    setExpParticipants([]);
+    setExpPayerPassword('');
+  };
+
+  const isPayerMe = expPaidBy === identity?.member_id;
+
+  const handleAddExpense = async () => {
+    if (!expDesc.trim()) { toast.warn('Vui lòng nhập tên khoản chi.'); return; }
+    const amt = parseFloat(expAmount);
+    if (isNaN(amt) || amt <= 0) { toast.warn('Số tiền không hợp lệ.'); return; }
+    if (!expPaidBy) { toast.warn('Vui lòng chọn người trả.'); return; }
+    if (expParticipants.length === 0) { toast.warn('Chọn ít nhất 1 người tham gia chia khoản này.'); return; }
+
+    const payerPassword = isPayerMe ? identity.name_password : expPayerPassword;
+    if (!payerPassword) { toast.warn('Vui lòng nhập mật khẩu của người trả.'); return; }
+
+    setAddingExpense(true);
+    try {
+      const res = await axiosClient.post(`/split/groups/${code}/expenses`, {
+        group_password: groupPassword, description: expDesc.trim(), amount: amt,
+        paid_by: expPaidBy, payer_password: payerPassword, participants: expParticipants,
+      });
+      const { expense_id, ...groupData } = res.data;
+      setGroup(groupData);
+      resetExpenseForm();
+      toast.success('Đã thêm khoản chi!');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Không thể thêm khoản chi.');
+    } finally {
+      setAddingExpense(false);
+    }
+  };
+
+  const handleDeleteExpense = async (expense) => {
+    const isMine = expense.paid_by === identity?.member_id;
+    let payerPassword = isMine ? identity.name_password : null;
+    if (!payerPassword) {
+      payerPassword = window.prompt(`Nhập mật khẩu của ${nameOf(expense.paid_by)} để xoá khoản chi này:`);
+      if (!payerPassword) return;
+    }
+    try {
+      const res = await axiosClient.delete(`/split/groups/${code}/expenses/${expense.expense_id}`, {
+        data: { group_password: groupPassword, payer_password: payerPassword },
+      });
+      setGroup(res.data);
+      toast.success('Đã xoá khoản chi.');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Không thể xoá.');
     }
   };
 
   const handleFinalize = async () => {
     setSubmitting(true);
     try {
-      const res = await axiosClient.post(`/split/groups/${code}/finalize`);
+      const res = await axiosClient.post(`/split/groups/${code}/finalize`, { group_password: groupPassword });
       setGroup(res.data);
       toast.success('Đã chốt nhóm!');
     } catch (error) {
-      toast.error('Không thể chốt nhóm.');
+      toast.error(error.response?.data?.error || 'Không thể chốt nhóm.');
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const startEdit = () => {
-    if (!myMember) return;
-    setName(myMember.name);
-    setAmount(String(myMember.amount_spent));
-    setWeight(String(myMember.weight));
-    setUseWeight(myMember.weight !== 1);
-    setEditing(true);
   };
 
   const copyLink = () => {
@@ -118,10 +220,28 @@ function SplitGroupPage() {
     toast.success('Đã copy link!');
   };
 
-  if (loading) {
+  const nameOf = (mid) => group?.members?.find(m => m.member_id === mid)?.name || '?';
+
+  // ── Password gate ──
+  if (!unlocked) {
     return (
       <div className="gsp-page gsp-center">
-        <FiLoader className="spin gsp-loading-icon" />
+        <ToastContainer position="bottom-right" theme="colored" />
+        <div className="gsp-card gsp-gate-card">
+          <div className="gsp-hero-badge"><FiKey /> NHÓM RIÊNG TƯ</div>
+          <h3>Nhập mật khẩu nhóm</h3>
+          <p className="gsp-hint">Hỏi người tạo nhóm để lấy mật khẩu truy cập.</p>
+          <input
+            className="gsp-input" type="text" placeholder="Mật khẩu nhóm"
+            value={groupPassword} onChange={(e) => setGroupPassword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleGateSubmit()}
+            autoFocus
+          />
+          {gateError && <p className="gsp-error-text"><FiAlertCircle /> {gateError}</p>}
+          <button className="btn-ink gsp-submit-btn" onClick={handleGateSubmit} disabled={gateSubmitting}>
+            {gateSubmitting ? <FiLoader className="spin" /> : <FiCheck />} Vào nhóm
+          </button>
+        </div>
       </div>
     );
   }
@@ -137,7 +257,25 @@ function SplitGroupPage() {
     );
   }
 
+  if (!group) {
+    return (
+      <div className="gsp-page gsp-center">
+        <FiLoader className="spin gsp-loading-icon" />
+      </div>
+    );
+  }
+
   const isLocked = group.is_locked;
+  const balances = (() => {
+    const b = {};
+    group.members.forEach(m => { b[m.member_id] = 0; });
+    group.expenses.forEach(e => {
+      b[e.paid_by] = (b[e.paid_by] || 0) + e.amount;
+      const share = e.amount / (e.participants.length || 1);
+      e.participants.forEach(pid => { b[pid] = (b[pid] || 0) - share; });
+    });
+    return b;
+  })();
 
   return (
     <div className="gsp-page animate-slide-up">
@@ -153,8 +291,41 @@ function SplitGroupPage() {
         </button>
       </div>
 
+      {!identity && !isLocked && !claimingName && (
+        <div className="gsp-card gsp-join-card">
+          <h3>Tham gia nhóm</h3>
+          <div className="gsp-join-row">
+            <input className="gsp-input" placeholder="Tên của bạn"
+              value={joinName} onChange={(e) => setJoinName(e.target.value)} />
+            <input className="gsp-input" type="password" placeholder="Đặt mật khẩu cho tên này"
+              value={joinPassword} onChange={(e) => setJoinPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleJoin()} />
+            <button className="btn-ink gsp-join-btn" onClick={handleJoin} disabled={joining}>
+              {joining ? <FiLoader className="spin" /> : <FiCheck />} Tham gia
+            </button>
+          </div>
+          <p className="gsp-hint">Nhớ mật khẩu này để sửa lại chi tiêu của bạn sau này.</p>
+        </div>
+      )}
+
+      {claimingName && (
+        <div className="gsp-card gsp-join-card">
+          <h3>Xác nhận danh tính "{claimingName}"</h3>
+          <p className="gsp-hint">Tên này đã tồn tại. Nếu đó là bạn, nhập mật khẩu đã đặt trước đó.</p>
+          <div className="gsp-join-row">
+            <input className="gsp-input" type="password" placeholder="Mật khẩu của bạn"
+              value={claimPassword} onChange={(e) => setClaimPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleClaim()} autoFocus />
+            <button className="btn-ink gsp-join-btn" onClick={handleClaim} disabled={claiming}>
+              {claiming ? <FiLoader className="spin" /> : <FiCheck />} Xác nhận
+            </button>
+            <button className="btn-outline" onClick={() => { setClaimingName(null); setClaimPassword(''); }}>Huỷ</button>
+          </div>
+        </div>
+      )}
+
       <div className="gsp-layout">
-        {/* Member list + running total */}
+        {/* Members */}
         <div className="gsp-card">
           <div className="gsp-card-header">
             <h3>Thành viên ({group.member_count})</h3>
@@ -165,16 +336,17 @@ function SplitGroupPage() {
               <p className="gsp-empty">Chưa có ai tham gia. Hãy là người đầu tiên!</p>
             )}
             {group.members.map((m) => (
-              <div key={m.member_id} className={`gsp-member-row ${m.member_id === memberId ? 'is-me' : ''}`}>
-                <span className="gsp-member-name">{m.name}{m.member_id === memberId && ' (bạn)'}</span>
-                {m.weight !== 1 && <span className="gsp-member-weight">×{m.weight}</span>}
-                <span className="gsp-member-amount">{fmt(m.amount_spent)}</span>
+              <div key={m.member_id} className={`gsp-member-row ${m.member_id === identity?.member_id ? 'is-me' : ''}`}>
+                <span className="gsp-member-name">{m.name}{m.member_id === identity?.member_id && ' (bạn)'}</span>
+                <span className={`gsp-member-amount ${balances[m.member_id] >= 0 ? 'positive' : 'negative'}`}>
+                  {balances[m.member_id] >= 0 ? '+' : ''}{fmt(balances[m.member_id])}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Right column: form or settlement */}
+        {/* Expenses / Settlement */}
         <div className="gsp-card">
           {isLocked ? (
             <>
@@ -193,78 +365,103 @@ function SplitGroupPage() {
                   ))}
                 </div>
               )}
-              <div className="gsp-balance-detail">
-                <h4>Chi tiết từng người</h4>
-                {group.members.map((m) => {
-                  const totalWeight = group.members.reduce((s, x) => s + (x.weight || 1), 0) || 1;
-                  const fairShare = group.total_spent * ((m.weight || 1) / totalWeight);
-                  const balance = m.amount_spent - fairShare;
-                  return (
-                    <div key={m.member_id} className="gsp-balance-row">
-                      <span>{m.name}</span>
-                      <span className="gsp-balance-mid">đã chi {fmt(m.amount_spent)} / cần chi {fmt(fairShare)}</span>
-                      <span className={`gsp-balance-val ${balance >= 0 ? 'positive' : 'negative'}`}>
-                        {balance >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
-                        {balance >= 0 ? `+${fmt(balance)}` : `-${fmt(Math.abs(balance))}`}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          ) : myMember && !editing ? (
-            <>
-              <h3>Bạn đã gửi chi tiêu</h3>
-              <div className="gsp-my-entry">
-                <span>{myMember.name}</span>
-                <strong>{fmt(myMember.amount_spent)}</strong>
-              </div>
-              <button className="btn-outline gsp-edit-btn" onClick={startEdit}>
-                <FiEdit2 /> Sửa lại
-              </button>
-              <button className="btn-ink gsp-finalize-btn" onClick={handleFinalize} disabled={submitting}>
-                {submitting ? <FiLoader className="spin" /> : <FiLock />} Chốt nhóm
-              </button>
-              <p className="gsp-hint">Chốt khi mọi người đã gửi xong chi tiêu của mình.</p>
             </>
           ) : (
             <>
-              <h3>{editing ? 'Sửa chi tiêu của bạn' : 'Tham gia nhóm'}</h3>
-              <label className="gsp-label">Tên của bạn</label>
-              <input className="gsp-input" value={name} onChange={(e) => setName(e.target.value)}
-                placeholder="Ví dụ: Trung" disabled={editing} />
+              <h3>Khoản chi tiêu</h3>
+              <div className="gsp-expense-list">
+                {group.expenses.length === 0 && (
+                  <p className="gsp-empty">Chưa có khoản chi nào.</p>
+                )}
+                {group.expenses.map((e) => (
+                  <div key={e.expense_id} className="gsp-expense-row">
+                    <div className="gsp-expense-main">
+                      <span className="gsp-expense-desc"><FiTag /> {e.description}</span>
+                      <span className="gsp-expense-amount">{fmt(e.amount)}</span>
+                    </div>
+                    <div className="gsp-expense-meta">
+                      <span>{nameOf(e.paid_by)} trả · chia cho {e.participants.map(nameOf).join(', ')}</span>
+                      <button className="gsp-expense-del" onClick={() => handleDeleteExpense(e)}>
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-              <label className="gsp-label">Số tiền đã chi</label>
-              <input className="gsp-input" type="number" min="0" value={amount}
-                onChange={(e) => setAmount(e.target.value)} placeholder="0" />
+              {group.members.length >= 1 && (
+                <div className="gsp-add-expense">
+                  <label className="gsp-label">Tên khoản chi</label>
+                  <input className="gsp-input" placeholder="Ví dụ: Ăn tối, tiền xăng..."
+                    value={expDesc} onChange={(e) => setExpDesc(e.target.value)} />
 
-              <label className="gsp-checkbox-label">
-                <input type="checkbox" checked={useWeight} onChange={(e) => setUseWeight(e.target.checked)} />
-                Đặt tỉ trọng riêng (mặc định chia đều)
-              </label>
-              {useWeight && (
-                <input className="gsp-input" type="number" min="0.1" step="0.1" value={weight}
-                  onChange={(e) => setWeight(e.target.value)} placeholder="1" />
+                  <label className="gsp-label">Số tiền</label>
+                  <input className="gsp-input" type="number" min="0" placeholder="0"
+                    value={expAmount} onChange={(e) => setExpAmount(e.target.value)} />
+
+                  <label className="gsp-label">Ai đã trả</label>
+                  <select className="gsp-input" value={expPaidBy} onChange={(e) => setExpPaidBy(e.target.value)}>
+                    {group.members.map(m => (
+                      <option key={m.member_id} value={m.member_id}>{m.name}</option>
+                    ))}
+                  </select>
+
+                  {!isPayerMe && expPaidBy && (
+                    <>
+                      <label className="gsp-label">Mật khẩu của {nameOf(expPaidBy)}</label>
+                      <input className="gsp-input" type="password" placeholder="Bắt buộc để xác nhận"
+                        value={expPayerPassword} onChange={(e) => setExpPayerPassword(e.target.value)} />
+                    </>
+                  )}
+
+                  <div className="gsp-field-header">
+                    <label className="gsp-label">Chia cho ai</label>
+                    <button className="gsp-select-all" onClick={selectAllParticipants}>Chọn tất cả</button>
+                  </div>
+                  <div className="gsp-participant-chips">
+                    {group.members.map(m => (
+                      <button
+                        key={m.member_id}
+                        className={`gsp-chip ${expParticipants.includes(m.member_id) ? 'active' : ''}`}
+                        onClick={() => toggleParticipant(m.member_id)}
+                      >
+                        {m.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button className="btn-ink gsp-submit-btn" onClick={handleAddExpense} disabled={addingExpense}>
+                    {addingExpense ? <FiLoader className="spin" /> : <FiPlus />} Thêm khoản chi
+                  </button>
+                </div>
               )}
 
-              <button className="btn-ink gsp-submit-btn"
-                onClick={editing ? handleUpdate : handleSubmit} disabled={submitting}>
-                {submitting ? <FiLoader className="spin" /> : <FiCheck />}
-                {editing ? ' Lưu thay đổi' : ' Gửi chi tiêu'}
-              </button>
-              {editing && (
-                <button className="btn-outline gsp-cancel-btn" onClick={() => setEditing(false)}>Huỷ</button>
-              )}
-
-              {group.members.length > 0 && !editing && (
+              {group.expenses.length > 0 && (
                 <button className="btn-ink gsp-finalize-btn" onClick={handleFinalize} disabled={submitting}>
-                  <FiLock /> Chốt nhóm ngay
+                  {submitting ? <FiLoader className="spin" /> : <FiLock />} Chốt nhóm
                 </button>
               )}
             </>
           )}
         </div>
       </div>
+
+      {isLocked && (
+        <div className="gsp-card">
+          <h3>Chi tiết từng người</h3>
+          <div className="gsp-balance-detail">
+            {group.members.map((m) => (
+              <div key={m.member_id} className="gsp-balance-row">
+                <span>{m.name}</span>
+                <span className={`gsp-balance-val ${balances[m.member_id] >= 0 ? 'positive' : 'negative'}`}>
+                  {balances[m.member_id] >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
+                  {balances[m.member_id] >= 0 ? `+${fmt(balances[m.member_id])}` : `-${fmt(Math.abs(balances[m.member_id]))}`}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
