@@ -1,0 +1,217 @@
+/* DocGenerator.css */
+
+.dgn-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 60px 0 80px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.dgn-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dgn-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0891b2;
+  background: rgba(8, 145, 178, 0.08);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  width: fit-content;
+}
+
+.dgn-hero-title {
+  font-size: 56px;
+  font-weight: 500;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  color: var(--ink-black);
+}
+
+.dgn-hero-accent { color: #0891b2; font-style: italic; }
+
+.dgn-hero-desc {
+  font-size: 18px;
+  color: var(--charcoal);
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.dgn-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--white);
+  border: 1px solid var(--dust-taupe);
+  border-radius: 28px;
+  padding: 36px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+}
+
+.dgn-field { display: flex; flex-direction: column; gap: 10px; }
+
+.dgn-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dgn-field-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dgn-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--charcoal);
+}
+
+.dgn-charcount {
+  font-size: 12px;
+  color: var(--slate-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.dgn-sample-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0891b2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dgn-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--dust-taupe);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: var(--font-primary);
+  color: var(--ink-black);
+  background: var(--canvas-cream);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dgn-textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 16px 20px;
+  border: 1.5px solid var(--dust-taupe);
+  border-radius: 16px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  color: var(--ink-black);
+  background: var(--canvas-cream);
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.dgn-input:focus, .dgn-textarea:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  background: var(--white);
+}
+
+.dgn-hint {
+  font-size: 12px;
+  color: var(--slate-gray);
+  line-height: 1.5;
+}
+
+.dgn-hint code {
+  background: rgba(8, 145, 178, 0.08);
+  color: #0891b2;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.dgn-format-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.dgn-format-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1.5px solid var(--dust-taupe);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--charcoal);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dgn-format-tab:hover { border-color: #0891b2; }
+
+.dgn-format-tab.active {
+  border-color: #0891b2;
+  background: rgba(8, 145, 178, 0.06);
+  color: #0891b2;
+}
+
+.dgn-cost-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--charcoal);
+  background: var(--canvas-cream);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.dgn-cost-icon { color: #0891b2; flex-shrink: 0; }
+
+.dgn-submit {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dgn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.dgn-success-text {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 700px) {
+  .dgn-hero-title { font-size: 36px; }
+  .dgn-main { padding: 24px; }
+  .dgn-format-tabs { flex-direction: column; }
+}

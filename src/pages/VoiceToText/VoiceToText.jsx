@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axiosClient from '../../services/axiosClient';
 import { AuthContext } from '../../contexts/AuthContext';
 import { FiUploadCloud, FiLoader, FiCopy, FiDownload, FiMic, FiFileText } from 'react-icons/fi';
+import { HelpPanel, HelpSteps, HelpTip, FieldHint } from '../../components/ui/HelpPanel';
 
 const MODELS = [
   { value: 'tiny', label: 'Tiny (nhanh nhất)' },
@@ -101,6 +102,19 @@ function VoiceToText() {
         <p>Chuyển âm thanh cuộc họp, phỏng vấn thành văn bản bằng mô hình Whisper</p>
       </header>
 
+      <HelpPanel>
+        <HelpSteps steps={[
+          <>Kéo thả hoặc chọn file âm thanh (mp3, wav, m4a, ogg, flac, webm).</>,
+          <>Chọn <strong>Mô hình</strong>: Tiny xử lý nhanh nhất nhưng độ chính xác thấp hơn; Large chính xác nhất nhưng chậm hơn. Base là lựa chọn cân bằng phù hợp cho hầu hết trường hợp.</>,
+          <>Chọn <strong>Ngôn ngữ</strong> của file âm thanh, hoặc để "Tự động" nếu không chắc/file có nhiều ngôn ngữ.</>,
+          <>Nhấn <strong>"Chuyển đổi"</strong> — chờ xử lý (file dài hoặc model lớn sẽ mất nhiều thời gian hơn).</>,
+          <>Sau khi có kết quả: Copy văn bản, tải file <code>.txt</code> thuần, hoặc tải file <code>.srt</code> phụ đề có timestamp để dùng cho video.</>,
+        ]} />
+        <HelpTip>
+          Chi phí tính theo <strong>số phút audio làm tròn lên</strong> (ví dụ 1 phút 5 giây tính là 2 phút = 2 credit), không phụ thuộc vào model chọn.
+        </HelpTip>
+      </HelpPanel>
+
       <main className="vtt-content">
         <div className="vtt-card glass-panel">
           {/* Dropzone */}
@@ -131,7 +145,10 @@ function VoiceToText() {
           {/* Options */}
           <div className="vtt-options">
             <div className="form-group">
-              <label>Mô hình</label>
+              <label>
+                Mô hình
+                <FieldHint text="Tiny/Base = nhanh, phù hợp file rõ tiếng. Medium/Large = chậm hơn nhưng bắt tốt giọng khó nghe, nhiều người nói cùng lúc." />
+              </label>
               <select className="input-mc" value={model} onChange={(e) => setModel(e.target.value)}>
                 {MODELS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>

@@ -11,6 +11,15 @@ import CreateSplitGroup from './pages/GroupSplit/CreateSplitGroup';
 import SplitGroupPage from './pages/GroupSplit/SplitGroupPage';
 import SeoAnalyzer from './pages/SeoAnalyzer/SeoAnalyzer';
 import Summarizer from './pages/Summarizer/Summarizer';
+import CreateMeetingPoll from './pages/MeetingPoll/CreateMeetingPoll';
+import MeetingPollPage from './pages/MeetingPoll/MeetingPollPage';
+import DataExtractor from './pages/DataExtractor/DataExtractor';
+import ImageToText from './pages/ImageToText/ImageToText';
+import CsvCleaner from './pages/CsvCleaner/CsvCleaner';
+import DocGenerator from './pages/DocGenerator/DocGenerator';
+import CreateQuickPoll from './pages/QuickPoll/CreateQuickPoll';
+import QuickPollPage from './pages/QuickPoll/QuickPollPage';
+import SocialBot from './pages/SocialBot/SocialBot';
 import About from './pages/About/About';
 import Settings from './pages/Settings/Settings';
 import Login from './pages/Auth/Login';
@@ -37,6 +46,12 @@ function App() {
             <Route path="split-create" element={<CreateSplitGroup />} />
             <Route path="tool/seo-analyzer" element={<SeoAnalyzer />} />
             <Route path="tool/summarizer" element={<Summarizer />} />
+            <Route path="meeting-create" element={<CreateMeetingPoll />} />
+            <Route path="tool/data-extractor" element={<DataExtractor />} />
+            <Route path="tool/image-to-text" element={<ImageToText />} />
+            <Route path="tool/csv-cleaner" element={<CsvCleaner />} />
+            <Route path="tool/doc-generator" element={<DocGenerator />} />
+            <Route path="tool/social-bot" element={<SocialBot />} />
             <Route path="wallet" element={<Wallet />} />
             <Route path="settings" element={<Settings />} />
           </Route>
@@ -45,6 +60,9 @@ function App() {
           </Route>
           <Route path="about" element={<About />} />
           <Route path="split/:code" element={<SplitGroupPage />} />
+          <Route path="meeting/:code" element={<MeetingPollPage />} />
+          <Route path="poll-create" element={<CreateQuickPoll />} />
+          <Route path="poll/:code" element={<QuickPollPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axiosClient from '../../services/axiosClient';
 import { FiUsers, FiLoader, FiArrowRight, FiCopy, FiCheckCircle } from 'react-icons/fi';
+import { HelpPanel, HelpSteps, HelpTip, HelpWarning } from '../../components/ui/HelpPanel';
 import './GroupSplit.css';
 
 function CreateSplitGroup() {
@@ -72,6 +73,23 @@ function CreateSplitGroup() {
           Tạo nhóm, chia sẻ link + mật khẩu cho bạn bè, mỗi người thêm khoản chi tiêu — hệ thống tự tính ai cần trả ai bao nhiêu.
         </p>
       </div>
+
+      <HelpPanel>
+        <HelpSteps steps={[
+          <>Đặt tên nhóm/chuyến đi (không bắt buộc) rồi nhấn <strong>"Tạo nhóm"</strong>.</>,
+          <><strong>Lưu lại mật khẩu hiện ra ngay sau đó — chỉ hiện đúng 1 lần</strong>, đây là mật khẩu để bất kỳ ai có link cũng cần nhập mới xem/tham gia được nhóm.</>,
+          <>Copy link + mật khẩu, gửi cho cả nhóm qua Zalo/Messenger/bất kỳ kênh nào.</>,
+          <>Mỗi thành viên tự mở link, nhập mật khẩu nhóm, rồi nhập tên + tự đặt một mật khẩu riêng cho tên đó (để lần sau vào lại hoặc sửa chi tiêu, hệ thống nhận đúng là họ).</>,
+          <>Ai cũng thêm được khoản chi: nhập số tiền, chọn người đã trả, tick người cùng tham gia chia khoản đó — mỗi khoản chi có thể có nhóm người tham gia khác nhau.</>,
+          <>Khi mọi người đã nhập xong, bất kỳ ai bấm <strong>"Chốt nhóm"</strong> — hệ thống tính ra bảng "ai cần chuyển khoản cho ai bao nhiêu".</>,
+        ]} />
+        <HelpTip>
+          Không cần tài khoản để tham gia — chỉ người tạo nhóm cần đăng nhập, các thành viên khác chỉ cần link + mật khẩu nhóm.
+        </HelpTip>
+        <HelpWarning>
+          Mật khẩu nhóm chỉ hiển thị đúng 1 lần lúc tạo — nếu làm mất, không có cách nào lấy lại, phải tạo nhóm mới.
+        </HelpWarning>
+      </HelpPanel>
 
       <div className="gsp-create-card">
         <label className="gsp-label">Tên nhóm / chuyến đi (không bắt buộc)</label>

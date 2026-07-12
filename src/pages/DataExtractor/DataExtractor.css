@@ -1,0 +1,328 @@
+/* DataExtractor.css */
+
+.dex-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 60px 0 80px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.dex-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dex-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  width: fit-content;
+}
+
+.dex-hero-title {
+  font-size: 56px;
+  font-weight: 500;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  color: var(--ink-black);
+}
+
+.dex-hero-accent { color: #10b981; font-style: italic; }
+
+.dex-hero-desc {
+  font-size: 18px;
+  color: var(--charcoal);
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.dex-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--white);
+  border: 1px solid var(--dust-taupe);
+  border-radius: 28px;
+  padding: 36px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+}
+
+.dex-field { display: flex; flex-direction: column; gap: 10px; }
+
+.dex-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--charcoal);
+}
+
+.dex-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--dust-taupe);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: var(--font-primary);
+  color: var(--ink-black);
+  background: var(--canvas-cream);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dex-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background: var(--white);
+}
+
+.dex-mode-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(20, 20, 19, 0.05);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  width: fit-content;
+}
+
+.dex-mode-tab {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  background: transparent;
+  color: var(--slate-gray);
+  transition: all 0.18s;
+}
+
+.dex-mode-tab:hover { color: var(--ink-black); }
+
+.dex-mode-tab.active {
+  background: var(--white);
+  color: var(--ink-black);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.dex-cost-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--charcoal);
+  background: var(--canvas-cream);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.dex-cost-icon { color: #10b981; flex-shrink: 0; }
+
+.dex-submit {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dex-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Results */
+.dex-results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dex-card {
+  background: var(--white);
+  border: 1px solid var(--dust-taupe);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.dex-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-black);
+  margin-bottom: 14px;
+}
+
+.dex-meta-title { font-size: 15px; font-weight: 600; color: var(--ink-black); margin-bottom: 4px; }
+.dex-meta-desc { font-size: 13px; color: var(--slate-gray); margin-bottom: 12px; line-height: 1.5; }
+
+.dex-meta-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dex-meta-stats span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.dex-table-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.dex-table-tab {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--dust-taupe);
+  background: var(--white);
+  color: var(--charcoal);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dex-table-tab.active {
+  border-color: #10b981;
+  background: #10b981;
+  color: var(--white);
+}
+
+.dex-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--dust-taupe);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.dex-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.dex-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--slate-gray);
+  padding: 10px 14px;
+  background: var(--canvas-cream);
+  white-space: nowrap;
+  border-bottom: 1.5px solid var(--dust-taupe);
+}
+
+.dex-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  color: var(--ink-black);
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dex-table tr:last-child td { border-bottom: none; }
+
+.dex-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 8px 16px;
+}
+
+.dex-lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.dex-list-block {
+  background: var(--canvas-cream);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.dex-list-idx {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dex-list-block ul {
+  margin-top: 8px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dex-list-block li {
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.4;
+}
+
+.dex-list-more {
+  display: block;
+  font-size: 11px;
+  color: var(--slate-gray);
+  margin-top: 6px;
+}
+
+.dex-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.dex-link-item {
+  font-size: 13px;
+  color: var(--link-blue);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dex-link-item:hover { background: rgba(56, 96, 190, 0.06); text-decoration: underline; }
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 700px) {
+  .dex-hero-title { font-size: 36px; }
+  .dex-main { padding: 24px; }
+  .dex-lists-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,146 @@
+/* HelpPanel.css — shared "Hướng dẫn sử dụng" collapsible block */
+
+.hlp-panel {
+  border: 1.5px solid var(--dust-taupe);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.hlp-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--canvas-cream);
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-primary);
+  color: var(--charcoal);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.hlp-toggle:hover { background: rgba(207, 69, 0, 0.05); }
+
+.hlp-chevron { margin-left: auto; }
+
+.hlp-body {
+  padding: 18px 22px 22px;
+  border-top: 1px solid var(--dust-taupe);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hlp-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.hlp-steps li {
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.6;
+  padding-left: 4px;
+}
+
+.hlp-steps li strong { color: var(--ink-black); }
+
+.hlp-steps code {
+  background: rgba(207, 69, 0, 0.08);
+  color: var(--signal-orange);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.hlp-tip {
+  font-size: 12px;
+  color: var(--charcoal);
+  background: rgba(56, 96, 190, 0.06);
+  border-radius: 8px;
+  padding: 10px 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.hlp-warning {
+  font-size: 12px;
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Inline field hint (?) icon + hover tooltip */
+.hlp-hint-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  cursor: help;
+}
+
+.hlp-hint-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--slate-gray);
+  font-size: 13px;
+  transition: color 0.15s;
+}
+
+.hlp-hint-wrap:hover .hlp-hint-icon { color: var(--signal-orange); }
+
+.hlp-hint-box {
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink-black);
+  color: var(--white);
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  width: max-content;
+  max-width: 260px;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+  z-index: 20;
+  text-transform: none;
+  letter-spacing: normal;
+  pointer-events: none;
+}
+
+.hlp-hint-box::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ink-black);
+}
+
+.hlp-hint-wrap:hover .hlp-hint-box {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 600px) {
+  .hlp-hint-box { max-width: 200px; }
+}

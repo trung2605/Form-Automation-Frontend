@@ -7,6 +7,7 @@ import {
   FiUsers, FiCopy, FiLoader, FiLock, FiPlus, FiTrash2, FiCheck,
   FiArrowRight, FiAlertCircle, FiTrendingUp, FiTrendingDown, FiTag, FiKey,
 } from 'react-icons/fi';
+import { HelpPanel, HelpSteps, HelpTip, FieldHint } from '../../components/ui/HelpPanel';
 import './GroupSplit.css';
 
 const POLL_MS = 4000;
@@ -399,7 +400,10 @@ function SplitGroupPage() {
                   <input className="gsp-input" type="number" min="0" placeholder="0"
                     value={expAmount} onChange={(e) => setExpAmount(e.target.value)} />
 
-                  <label className="gsp-label">Ai đã trả</label>
+                  <label className="gsp-label">
+                    Ai đã trả
+                    <FieldHint text="Chọn tên người thực sự bỏ tiền cho khoản này. Nếu chọn người khác (không phải bạn), sẽ phải nhập mật khẩu của họ để xác nhận — không ai giả danh người khác được." />
+                  </label>
                   <select className="gsp-input" value={expPaidBy} onChange={(e) => setExpPaidBy(e.target.value)}>
                     {group.members.map(m => (
                       <option key={m.member_id} value={m.member_id}>{m.name}</option>
@@ -415,7 +419,10 @@ function SplitGroupPage() {
                   )}
 
                   <div className="gsp-field-header">
-                    <label className="gsp-label">Chia cho ai</label>
+                    <label className="gsp-label">
+                      Chia cho ai
+                      <FieldHint text="Tick những người cùng tham gia chi trả cho khoản này. Những ai không được tick sẽ KHÔNG bị tính tiền khoản này — ví dụ 1 người không uống bia thì đừng tick họ vào khoản 'tiền bia'." />
+                    </label>
                     <button className="gsp-select-all" onClick={selectAllParticipants}>Chọn tất cả</button>
                   </div>
                   <div className="gsp-participant-chips">

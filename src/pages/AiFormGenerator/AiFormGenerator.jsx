@@ -7,6 +7,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { FiUpload, FiLoader, FiCopy, FiCheckCircle, FiFileText } from 'react-icons/fi';
 import { QRCodeSVG } from 'qrcode.react';
 import { useGoogleLogin } from '@react-oauth/google';
+import { HelpPanel, HelpSteps, HelpTip, HelpWarning } from '../../components/ui/HelpPanel';
 
 const JSON_TEMPLATE = `{
   "title": "Tên biểu mẫu của bạn",
@@ -161,6 +162,21 @@ function AiFormGenerator() {
         <h1>FORM GENERATOR</h1>
         <p>Tạo Google Form tự động từ cấu trúc JSON</p>
       </header>
+
+      <HelpPanel defaultOpen>
+        <HelpSteps steps={[
+          <>Copy Prompt Template ở cột trái, dán vào AI bạn đang dùng (ChatGPT, Claude, Gemini...) kèm theo yêu cầu form của bạn — AI sẽ trả về đúng cấu trúc JSON hệ thống cần.</>,
+          <>Dán JSON kết quả vào ô nhập bên phải, hoặc bấm <strong>"Upload .json"</strong> nếu đã lưu sẵn file.</>,
+          <>Nhấn <strong>"Đăng nhập Google & Tạo Form"</strong> — cửa sổ Google sẽ hiện ra, yêu cầu cấp quyền tạo Form/Drive (đây là quyền của Google, tách biệt hoàn toàn với tài khoản đăng nhập vào website).</>,
+          <>Sau khi tạo xong, form thật đã nằm trong Google Drive của bạn — nhận link + mã QR để chia sẻ ngay, chỉnh sửa tiếp trực tiếp trên Google Forms nếu cần.</>,
+        ]} />
+        <HelpTip>
+          Loại câu hỏi hỗ trợ: <code>TEXT</code>, <code>PARAGRAPH_TEXT</code>, <code>RADIO</code>, <code>CHECKBOX</code>, <code>DROP_DOWN</code>, <code>SECTION</code>. Dùng <code>goto_section</code>/<code>goto_action</code> trong lựa chọn RADIO/DROP_DOWN để tạo rẽ nhánh trang.
+        </HelpTip>
+        <HelpWarning>
+          Mỗi lần tạo form tốn 5 credit — cao hơn các tool khác vì gọi trực tiếp Google Forms API để tạo form thật (không phải bản nháp). Kiểm tra kỹ JSON trước khi tạo để tránh tốn credit cho form sai cấu trúc.
+        </HelpWarning>
+      </HelpPanel>
 
       <main className="ai-content-split">
         {/* Left Column: Instructions & Template */}

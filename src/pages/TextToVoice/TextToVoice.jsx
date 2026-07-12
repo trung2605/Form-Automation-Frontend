@@ -8,6 +8,7 @@ import {
   FiLoader, FiPlay, FiDownload, FiVolume2, FiUser, FiZap,
   FiSquare, FiInfo, FiChevronDown, FiChevronUp, FiCheckCircle, FiEdit3,
 } from 'react-icons/fi';
+import { HelpPanel, HelpSteps, HelpTip, FieldHint } from '../../components/ui/HelpPanel';
 
 const MAX_CHARS = 5000;
 const LANG_TABS = [
@@ -194,6 +195,19 @@ function TextToVoice() {
           Tổng hợp giọng nói tự nhiên với {voices.length} giọng đọc — hỗ trợ ngắt nghỉ &amp; nhấn mạnh thông minh
         </p>
       </div>
+
+      <HelpPanel>
+        <HelpSteps steps={[
+          <>Chọn giọng đọc ở sidebar trái — lọc theo ngôn ngữ (Tất cả / Tiếng Việt / English), bấm nút <strong>"Thử"</strong> để nghe mẫu trước khi dùng.</>,
+          <>Nhập văn bản cần đọc, hoặc bấm <strong>"Dùng văn bản mẫu"</strong> để xem ví dụ có sẵn kèm đầy đủ ký hiệu điều khiển.</>,
+          <>(Tùy chọn) Bấm mở panel <strong>"Ký hiệu điều khiển giọng đọc"</strong> bên dưới để chèn nhanh dấu ngắt nghỉ, nhấn mạnh — bôi đen chữ trước khi bấm ký hiệu để bọc quanh đoạn đó.</>,
+          <>Chỉnh <strong>Tốc độ giọng nói</strong> bằng thanh trượt (0.5× chậm nhất — 2.0× nhanh nhất).</>,
+          <>Nhấn <strong>"Tạo giọng nói"</strong> — nghe thử ngay trên trình phát, tải file MP3 nếu ưng ý.</>,
+        ]} />
+        <HelpTip>
+          Không biết viết văn bản sao cho tự nhiên? Mở panel <strong>"Tạo văn bản bằng AI"</strong> phía trên để copy sẵn prompt mẫu, dán vào ChatGPT/Gemini/Claude rồi dán kết quả ngược lại vào đây.
+        </HelpTip>
+      </HelpPanel>
 
       {/* 2-column layout */}
       <div className="ttv-layout">
@@ -383,7 +397,10 @@ function TextToVoice() {
           {/* Speed */}
           <div className="ttv-field">
             <div className="ttv-field-header">
-              <label className="ttv-label">Tốc độ giọng nói</label>
+              <label className="ttv-label">
+                Tốc độ giọng nói
+                <FieldHint text="1.0× là tốc độ tự nhiên mặc định. Giảm xuống nếu cần đọc rõ ràng, chậm rãi; tăng lên để rút ngắn thời lượng audio." />
+              </label>
               <span className="ttv-speed-val">{parseFloat(speed).toFixed(1)}×</span>
             </div>
             <div className="ttv-slider-track">

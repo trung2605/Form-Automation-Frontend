@@ -8,6 +8,7 @@ import {
   FiLoader, FiTrendingUp, FiZap, FiLink, FiFileText, FiTarget,
   FiCheckCircle, FiAlertTriangle, FiXCircle,
 } from 'react-icons/fi';
+import { HelpPanel, HelpSteps, HelpTip, HelpWarning, FieldHint } from '../../components/ui/HelpPanel';
 
 const MAX_CHARS = 20000;
 
@@ -64,6 +65,21 @@ function SeoAnalyzer() {
         </p>
       </div>
 
+      <HelpPanel>
+        <HelpSteps steps={[
+          <>Chọn cách nhập nội dung: <strong>Dán văn bản</strong> (copy trực tiếp bài viết) hoặc <strong>Nhập URL</strong> (hệ thống tự tải nội dung từ link).</>,
+          <>(Không bắt buộc) Nhập <strong>Target keyword</strong> — từ khóa chính bạn muốn kiểm tra mật độ, ví dụ tên sản phẩm/dịch vụ bạn đang SEO.</>,
+          <>Nhấn <strong>"Phân tích ngay"</strong> — hệ thống trả về thống kê từ khóa, độ dài câu, và đánh giá mật độ target keyword.</>,
+          <>Xem bảng <strong>Top từ khóa</strong> và <strong>Top cụm 2 từ</strong> để biết bài viết đang tự nhiên lặp từ gì nhiều nhất — dùng để phát hiện từ khóa phụ tiềm năng.</>,
+        ]} />
+        <HelpTip>
+          Mật độ target keyword chuẩn SEO nằm trong khoảng <strong>0.5% – 3%</strong>. Dưới 0.5% Google khó nhận diện chủ đề bài viết; trên 3% có nguy cơ bị đánh giá là nhồi nhét từ khóa (keyword stuffing), ảnh hưởng xấu tới thứ hạng.
+        </HelpTip>
+        <HelpWarning>
+          Chế độ nhập URL cần trang web công khai, không yêu cầu đăng nhập. Trang có chặn bot (Cloudflare, captcha) có thể không tải được nội dung.
+        </HelpWarning>
+      </HelpPanel>
+
       <div className="seo-main">
         <div className="seo-input-tabs">
           <button className={`seo-tab ${inputMode === 'text' ? 'active' : ''}`} onClick={() => setInputMode('text')}>
@@ -102,7 +118,10 @@ function SeoAnalyzer() {
         )}
 
         <div className="seo-field">
-          <label className="seo-label">Target keyword (không bắt buộc)</label>
+          <label className="seo-label">
+            Target keyword (không bắt buộc)
+            <FieldHint text="Từ khóa chính bạn muốn kiểm tra mật độ xuất hiện trong bài — thường là tên sản phẩm, dịch vụ, hoặc chủ đề chính bạn nhắm SEO." />
+          </label>
           <input
             className="seo-input"
             type="text"

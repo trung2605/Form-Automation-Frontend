@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { IconAutomation, IconDatabase, IconMessage, IconMic, IconTrending, IconSearch, IconClock, IconCheckCircle, IconArrow } from '../../components/Icons/CustomIcons';
-import { FiUsers, FiFileText } from 'react-icons/fi';
+import { FiUsers, FiFileText, FiCalendar, FiImage, FiCheckSquare, FiFilePlus, FiBarChart2 } from 'react-icons/fi';
 import './Dashboard.css';
 
 // Inline SVG previews — matches what's seeded in MongoDB
@@ -219,6 +219,107 @@ const PREVIEW_IMAGES = {
     <rect x="252" y="152" width="80" height="6" rx="3" fill="#c7d9f5"/>
     <rect x="252" y="164" width="60" height="6" rx="3" fill="#c7d9f5"/>
   </svg>`,
+
+  meeting_poll: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#faf5ff"/>
+    <rect x="24" y="20" width="352" height="180" rx="12" fill="white" stroke="#e9d5ff" stroke-width="1.5"/>
+    <rect x="40" y="36" width="60" height="10" rx="5" fill="#8b5cf6" opacity="0.3"/>
+    <rect x="112" y="36" width="60" height="10" rx="5" fill="#8b5cf6" opacity="0.3"/>
+    <rect x="184" y="36" width="60" height="10" rx="5" fill="#8b5cf6" opacity="0.3"/>
+    <rect x="256" y="36" width="60" height="10" rx="5" fill="#8b5cf6" opacity="0.3"/>
+    <rect x="40" y="60" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.15"/>
+    <rect x="112" y="60" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.65"/>
+    <rect x="184" y="60" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.9"/>
+    <rect x="256" y="60" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.3"/>
+    <rect x="40" y="92" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.4"/>
+    <rect x="112" y="92" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.2"/>
+    <rect x="184" y="92" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.5"/>
+    <rect x="256" y="92" width="60" height="24" rx="4" fill="#8b5cf6" opacity="0.15"/>
+    <rect x="184" y="60" width="60" height="24" rx="4" fill="none" stroke="#8b5cf6" stroke-width="2.5"/>
+    <path d="M198 72 l4 4 l8-8" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="40" y="140" width="336" height="44" rx="10" fill="#f5f0ff"/>
+    <circle cx="60" cy="162" r="14" fill="#8b5cf6"/>
+    <path d="M54 162 l4 4 l8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="84" y="154" width="180" height="8" rx="4" fill="#8b5cf6" opacity="0.5"/>
+    <rect x="84" y="166" width="120" height="6" rx="3" fill="#8b5cf6" opacity="0.3"/>
+  </svg>`,
+
+  image_to_text: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#fdf2f8"/>
+    <rect x="24" y="20" width="168" height="180" rx="12" fill="white" stroke="#fbcfe8" stroke-width="1.5"/>
+    <rect x="40" y="36" width="136" height="90" rx="8" fill="#fdf2f8"/>
+    <circle cx="70" cy="66" r="10" fill="#ec4899" opacity="0.4"/>
+    <path d="M40 116 l30-30 l20 20 l40-40 l46 46" stroke="#ec4899" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+    <rect x="40" y="140" width="100" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="40" y="156" width="136" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="40" y="172" width="80" height="8" rx="4" fill="#fbcfe8"/>
+    <path d="M204 86 l16 0 l-8 12z" fill="#ec4899"/>
+    <rect x="228" y="20" width="148" height="180" rx="12" fill="white" stroke="#fbcfe8" stroke-width="1.5"/>
+    <rect x="244" y="36" width="116" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="244" y="52" width="100" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="244" y="68" width="116" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="244" y="84" width="90" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="244" y="108" width="116" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="244" y="124" width="70" height="8" rx="4" fill="#fbcfe8"/>
+    <rect x="244" y="148" width="116" height="20" rx="8" fill="#ec4899"/>
+    <rect x="256" y="154" width="76" height="8" rx="4" fill="white"/>
+  </svg>`,
+
+  csv_cleaner: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#ecfdf5"/>
+    <rect x="24" y="20" width="168" height="180" rx="12" fill="white" stroke="#a7f3d0" stroke-width="1.5"/>
+    <rect x="36" y="36" width="144" height="20" rx="4" fill="#fca5a5" opacity="0.4"/>
+    <rect x="36" y="60" width="144" height="20" rx="4" fill="#fef08a" opacity="0.5"/>
+    <rect x="36" y="84" width="144" height="20" rx="4" fill="#fca5a5" opacity="0.4"/>
+    <rect x="36" y="108" width="70" height="20" rx="4" fill="#fef08a" opacity="0.5"/>
+    <rect x="36" y="132" width="144" height="20" rx="4" fill="#fca5a5" opacity="0.4"/>
+    <rect x="36" y="156" width="144" height="20" rx="4" fill="#e5e7eb"/>
+    <path d="M204 86 l16 0 l-8 12z" fill="#059669"/>
+    <rect x="228" y="20" width="148" height="180" rx="12" fill="white" stroke="#a7f3d0" stroke-width="1.5"/>
+    <rect x="244" y="36" width="116" height="20" rx="4" fill="#a7f3d0" opacity="0.5"/>
+    <rect x="244" y="60" width="116" height="20" rx="4" fill="#a7f3d0" opacity="0.5"/>
+    <rect x="244" y="84" width="116" height="20" rx="4" fill="#a7f3d0" opacity="0.5"/>
+    <circle cx="360" cy="46" r="12" fill="#059669"/>
+    <path d="M354 46 l4 4 l8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="244" y="120" width="116" height="20" rx="8" fill="#059669"/>
+    <rect x="256" y="126" width="76" height="8" rx="4" fill="white"/>
+  </svg>`,
+
+  doc_generator: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#ecfeff"/>
+    <rect x="24" y="20" width="160" height="180" rx="12" fill="white" stroke="#a5f3fc" stroke-width="1.5"/>
+    <rect x="40" y="36" width="128" height="10" rx="5" fill="#0891b2" opacity="0.4"/>
+    <rect x="40" y="56" width="128" height="6" rx="3" fill="#a5f3fc"/>
+    <rect x="40" y="70" width="100" height="6" rx="3" fill="#a5f3fc"/>
+    <rect x="40" y="88" width="10" height="10" rx="2" fill="#0891b2" opacity="0.5"/>
+    <rect x="58" y="90" width="110" height="6" rx="3" fill="#a5f3fc"/>
+    <rect x="40" y="106" width="10" height="10" rx="2" fill="#0891b2" opacity="0.5"/>
+    <rect x="58" y="108" width="90" height="6" rx="3" fill="#a5f3fc"/>
+    <rect x="40" y="124" width="128" height="6" rx="3" fill="#a5f3fc"/>
+    <rect x="40" y="138" width="128" height="6" rx="3" fill="#a5f3fc"/>
+    <path d="M196 86 l16 0 l-8 12z" fill="#0891b2"/>
+    <rect x="216" y="20" width="160" height="180" rx="12" fill="white" stroke="#a5f3fc" stroke-width="1.5"/>
+    <rect x="232" y="36" width="128" height="130" rx="6" fill="#f0fdff"/>
+    <text x="296" y="112" font-family="Arial" font-size="42" font-weight="700" fill="#0891b2" text-anchor="middle" opacity="0.6">PDF</text>
+    <rect x="232" y="178" width="60" height="6" rx="3" fill="#a5f3fc"/>
+  </svg>`,
+
+  quick_poll: `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220">
+    <rect width="400" height="220" fill="#fff7ed"/>
+    <rect x="24" y="20" width="352" height="180" rx="12" fill="white" stroke="#fed7aa" stroke-width="1.5"/>
+    <rect x="40" y="36" width="200" height="12" rx="6" fill="#f97316" opacity="0.4"/>
+    <rect x="40" y="68" width="100" height="8" rx="4" fill="#78716c"/>
+    <rect x="150" y="64" width="180" height="16" rx="8" fill="#fed7aa"/>
+    <rect x="150" y="64" width="130" height="16" rx="8" fill="#f97316"/>
+    <rect x="40" y="98" width="100" height="8" rx="4" fill="#78716c"/>
+    <rect x="150" y="94" width="180" height="16" rx="8" fill="#fed7aa"/>
+    <rect x="150" y="94" width="70" height="16" rx="8" fill="#f97316" opacity="0.7"/>
+    <rect x="40" y="128" width="100" height="8" rx="4" fill="#78716c"/>
+    <rect x="150" y="124" width="180" height="16" rx="8" fill="#fed7aa"/>
+    <rect x="150" y="124" width="36" height="16" rx="8" fill="#f97316" opacity="0.5"/>
+    <rect x="40" y="160" width="120" height="22" rx="11" fill="#f97316"/>
+    <rect x="52" y="167" width="80" height="8" rx="4" fill="white"/>
+  </svg>`,
 };
 
 const mockTools = [
@@ -245,21 +346,21 @@ const mockTools = [
   {
     id: 3,
     title: 'Data Extractor',
-    description: 'Tự động quét và thu thập dữ liệu có cấu trúc từ bất kỳ trang web nào chỉ với một đường link.',
+    description: 'Tự động quét và trích xuất bảng, danh sách dữ liệu có cấu trúc từ bất kỳ URL nào.',
     icon: <IconDatabase />,
     category: 'Dữ liệu',
-    status: 'upcoming',
-    route: '#',
+    status: 'active',
+    route: '/tool/data-extractor',
     previewKey: 'data_extractor',
   },
   {
     id: 4,
     title: 'Social Media Bot',
-    description: 'Lập lịch và tự động đăng bài viết, tương tác với khách hàng trên đa nền tảng mạng xã hội.',
+    description: 'Soạn và quản lý bài đăng cho Facebook, Zalo OA — lên lịch từ một nơi duy nhất.',
     icon: <IconMessage />,
     category: 'Tự động hóa',
-    status: 'upcoming',
-    route: '#',
+    status: 'active',
+    route: '/tool/social-bot',
     previewKey: 'social_media_bot',
   },
   {
@@ -301,6 +402,56 @@ const mockTools = [
     status: 'active',
     route: '/tool/summarizer',
     previewKey: 'text_summarizer',
+  },
+  {
+    id: 10,
+    title: 'Lịch hẹn nhóm',
+    description: 'Tạo lịch hẹn, mỗi người tick khung giờ rảnh, tự động tìm giờ đông người rảnh nhất.',
+    icon: <FiCalendar />,
+    category: 'Tiện ích',
+    status: 'active',
+    route: '/meeting-create',
+    previewKey: 'meeting_poll',
+  },
+  {
+    id: 11,
+    title: 'Image to Text',
+    description: 'Trích văn bản từ ảnh chụp tài liệu, biển hiệu, ghi chú viết tay bằng AI.',
+    icon: <FiImage />,
+    category: 'AI & Machine Learning',
+    status: 'active',
+    route: '/tool/image-to-text',
+    previewKey: 'image_to_text',
+  },
+  {
+    id: 12,
+    title: 'CSV/Excel Cleaner',
+    description: 'Tự động xóa dòng trùng, khoảng trắng thừa, cột/dòng trống trong file CSV/Excel.',
+    icon: <FiCheckSquare />,
+    category: 'Dữ liệu',
+    status: 'active',
+    route: '/tool/csv-cleaner',
+    previewKey: 'csv_cleaner',
+  },
+  {
+    id: 13,
+    title: 'Doc Generator',
+    description: 'Tạo file Word hoặc PDF chuyên nghiệp từ văn bản có định dạng chỉ trong vài giây.',
+    icon: <FiFilePlus />,
+    category: 'Tự động hóa',
+    status: 'active',
+    route: '/tool/doc-generator',
+    previewKey: 'doc_generator',
+  },
+  {
+    id: 14,
+    title: 'Poll / Vote nhanh',
+    description: 'Tạo bình chọn tức thì, chia sẻ link, xem kết quả real-time — không cần đăng nhập để tham gia.',
+    icon: <FiBarChart2 />,
+    category: 'Tiện ích',
+    status: 'active',
+    route: '/poll-create',
+    previewKey: 'quick_poll',
   },
   {
     id: 8,
