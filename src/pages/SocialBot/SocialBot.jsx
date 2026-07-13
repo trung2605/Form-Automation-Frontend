@@ -132,6 +132,20 @@ function SocialBot() {
         </div>
       )}
 
+      <HelpPanel>
+        <HelpSteps steps={[
+          <>Chọn nền tảng (Facebook hoặc Zalo OA) ở tab trên cùng.</>,
+          <>Nhập nội dung bài đăng (tối đa 5000 ký tự).</>,
+          <>Tùy chọn: đặt thời gian lên lịch — để trống thì bài lưu dạng "Nháp".</>,
+          <>Nhấn <strong>"Lưu bài đăng"</strong> — thao tác này miễn phí, không trừ credit.</>,
+          <>Trong danh sách bài đăng bên dưới, nhấn <strong>"Đăng ngay"</strong> để publish thật lên nền tảng đã chọn.</>,
+        ]} />
+        <HelpTip>Xóa bài đăng bất kỳ lúc nào bằng nút thùng rác cạnh mỗi bài trong danh sách.</HelpTip>
+        <HelpWarning>
+          Đây là bản khung sườn quản lý bài đăng. Đăng thật lên Facebook/Zalo cần kết nối OAuth thật (App ID/Secret) — hiện <strong>chưa cấu hình</strong>, nên "Đăng ngay" sẽ báo lỗi rõ ràng thay vì giả vờ thành công. Bài lỗi hiện trạng thái "Thất bại" kèm lý do cụ thể.
+        </HelpWarning>
+      </HelpPanel>
+
       <div className="sbt-main">
         <div className="sbt-platform-tabs">
           {PLATFORMS.map((p) => (
